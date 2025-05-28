@@ -113,7 +113,7 @@ export class FastifyEngine {
     async start() {
         if (!this.fastify) return;
         try {
-            await this.fastify.listen({ port: 3000 });
+            await this.fastify.listen({ port: 3000, host: '0.0.0.0' });
             console.log(`Servidor escuchando en http://localhost:3000`);
         } catch (err) {
             this.fastify.log.error(err);

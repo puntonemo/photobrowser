@@ -19,8 +19,10 @@ export default defineConfig(async () => {
                 '@modules': './src/modules',
                 '@lib': './src/lib',
                 '@client': './src/client',
+                '@model': './src/model',
             };
             return options;
         },
     };
 });
+
