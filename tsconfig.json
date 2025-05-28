@@ -1,0 +1,75 @@
+{
+  "include": [
+    "src/**/*"
+  ],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "baseUrl": "./src",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "lib": [
+      "ES2022",
+      "dom"
+    ],
+    "types": [
+      "node"
+    ],
+    "plugins": [
+      {
+        "transform": "typescript-transform-paths",
+        "afterDeclarations": true
+      }
+    ],
+    "typeRoots": [
+      "./src/types",
+      "./node_modules/@types",
+      "./node_modules/@types/"
+    ],
+    "paths": {
+      "@core": [
+        "core"
+      ],
+      "@modules/*": [
+        "modules/*"
+      ],
+      "@model/*": [
+        "model/*"
+      ],
+      "@lib/*": [
+        "lib/*"
+      ],
+      "@client/*": [
+        "client/*"
+      ]
+    },
+    "strict": true,
+    "pretty": true,
+    "allowJs": true,
+    "checkJs": true,
+    "sourceMap": true,
+    "declaration": true,
+    "incremental": true,
+    "skipLibCheck": true,
+    "noEmitOnError": false,
+    "noImplicitAny": false,
+    "removeComments": true,
+    "esModuleInterop": true,
+    "strictNullChecks": true,
+    "resolveJsonModule": true,
+    "noImplicitReturns": true,
+    "allowUnusedLabels": false,
+    "noUnusedParameters": true,
+    "noImplicitOverride": true,
+    "strictBindCallApply": false,
+    "allowUnreachableCode": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "noFallthroughCasesInSwitch": false,
+    "allowSyntheticDefaultImports": true,
+    "strictPropertyInitialization": false,
+    "forceConsistentCasingInFileNames": true,
+  }
+}

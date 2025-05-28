@@ -1,0 +1,13 @@
+{
+  "email_placeholder": "Correo electrónico",
+  "lastname_placeholder": "Apellidos",
+  "firstname_placeholder": "Nombre",
+  "pinCode_placeholder": "Código PIN",
+  "signIn_user_change": "Cambiar de usuario",
+  "signIn_google": "Iniciar sesión con Google",
+  "signIn_email": "Iniciar sesión con email",
+  "continue_label": "Continuar",
+  "error_unexpected": "Error inesperado",
+  "error_invalid_pincode": "Código PIN incorrecto",
+  "error_invalid_credential": "Credenciales no válldas"
+}

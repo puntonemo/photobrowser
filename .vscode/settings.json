@@ -1,0 +1,42 @@
+{
+  // Habilita el formateo automático al guardar
+  "editor.formatOnSave": true,
+  // Habilita acciones de código en ESLint al guardar (para que ESLint aplique correcciones)
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+  // Ajustes de Prettier
+  "prettier.singleQuote": true,
+  "prettier.trailingComma": "all",
+  "prettier.printWidth": 120,
+  "prettier.tabWidth": 4,
+  "prettier.semi": true,
+  // Configura ESLint como el formateador por defecto para TypeScript y JavaScript
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  // Opcional: Si deseas que Prettier sea el formateador predeterminado
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  // Desactiva el formateador de VS Code integrado
+  "typescript.format.enable": false,
+  "javascript.format.enable": false,
+  // Ignorar cambios de línea en los archivos de control de versiones
+  "files.eol": "\n",
+  "i18n-ally.localesPaths": [
+    "src/client/i18n"
+  ],
+  "i18n-ally.keystyle": "nested",
+  "i18n-ally.displayLanguage": "es",
+  "i18n-ally.namespace": true
+}

@@ -1,0 +1,14 @@
+._*
+.DS_Store
+/node_modules
+.env
+.env.*
+*.ignore.*
+*.ignore
+tsconfig.tsbuildinfo
+/package-lock.json
+/dist
+/src/modules/poc
+poc.ts
+*/ssl
+*.code-workspace
