@@ -38,5 +38,14 @@
   ],
   "i18n-ally.keystyle": "nested",
   "i18n-ally.displayLanguage": "es",
-  "i18n-ally.namespace": true
+  "i18n-ally.namespace": true,
+  "terminal.integrated.profiles.linux": {
+    "sh": {
+      "path": "sh",
+      "args": [
+        "-l"
+      ]
+    }
+  },
+  "terminal.integrated.defaultProfile.linux": "sh"
 }

@@ -1,13 +1,11 @@
-import { DataSource, Repository, ObjectLiteral, FindOptionsWhere } from "typeorm";
+import { DataSource, Repository, ObjectLiteral, FindOptionsWhere } from 'typeorm';
 
 export class GenericRepository<T extends ObjectLiteral, U extends FindOptionsWhere<T>> {
     public repository: Repository<T>;
     public entityName: string;
 
-    constructor(
-        dataSource: DataSource,
-        entity: { new (): T }
-    ) {
+    constructor(dataSource: DataSource, entity: { new (): T }) {
+        console.log(`GenericRepository for`, entity.name);
         this.repository = dataSource.getRepository(entity);
         this.entityName = entity.name;
     }
@@ -18,5 +16,8 @@ export class GenericRepository<T extends ObjectLiteral, U extends FindOptionsWhe
     public async create(entity: Partial<T>): Promise<T> {
         const newEntity = this.repository.create(entity as T);
         return this.repository.save(newEntity);
+    }
+    public async find(findOptions: Partial<U>): Promise<T[] | null> {
+        return this.repository.find(findOptions);
     }
 }

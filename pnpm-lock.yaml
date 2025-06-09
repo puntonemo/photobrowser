@@ -29,6 +29,9 @@ importers:
       base64url:
         specifier: ^3.0.1
         version: 3.0.1
+      chokidar:
+        specifier: ^4.0.3
+        version: 4.0.3
       cpx:
         specifier: ^1.5.0
         version: 1.5.0

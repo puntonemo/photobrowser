@@ -10,12 +10,28 @@ import { testModule } from '@modules/test';
 import { authModule } from '@modules/auth';
 import { pbModule } from '@modules/pb';
 import { DataSource } from 'typeorm';
-import * as entities from './model/entities'
+import * as entities from './model/entities';
 import { AppDataSourceInit } from './model';
-import { MediaItem } from './model/MediaItems';
-import { Repositories } from './model';
 
-const dbConnection = 'mariadb://lab:nsSFFt0UMF69]iF3@davidpascual.myasustor.com:3306/lab'
+// __dirname en ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+
+const envSpecific = path.resolve(__dirname, '..', `.env.${process.env.NODE_ENV}`);
+if (fs.existsSync(envSpecific)) {
+    dotenv.config({ path: envSpecific, override: true });
+}
+
+const dbConnection = process.env.DB_CONNECTION;
+const dbType = process.env.DB_CONNECTION;
+const dbLogging = process.env.DB_LOGGING === 'true';
+
+if (!dbConnection || !dbType) {
+    console.log('NO DB CONNECTION!');
+    process.exit(1);
+}
 
 const { hostname, port, username, password, pathname } = new URL(dbConnection);
 
@@ -29,37 +45,26 @@ export const AppDataSource = new DataSource({
     password: decodeURIComponent(password),
     database: decodeURIComponent(database),
     synchronize: false,
-    logging: true,
+    logging: dbLogging,
     entities: entities,
 });
 
-// __dirname en ESM
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
-
-const envSpecific = path.resolve(__dirname, '..', `.env.${process.env.NODE_ENV}`);
-if (fs.existsSync(envSpecific)) {
-    dotenv.config({ path: envSpecific, override: true });
-}
-
-const fastifyEngine = new FastifyEngine();
-
-fastifyEngine.register(cookie);
-fastifyEngine.register(session, {
-    secret: 'a-very-secret-key-that-should-be-long',
-    cookie: { secure: false }, // solo para dev
-});
-await fastifyEngine.registerModule(testModule);
-await fastifyEngine.registerModule(authModule);
-await fastifyEngine.registerModule(pbModule);
-
-fastifyEngine.registerReactApp('/app');
 // await fastifyEngine.compileReactApp();
-AppDataSource.initialize()
-    .then(async () => {
+AppDataSource.initialize().then(async () => {
+    AppDataSourceInit(AppDataSource);
 
-        AppDataSourceInit(AppDataSource);
-        void fastifyEngine.start();
+    const fastifyEngine = new FastifyEngine();
+
+    fastifyEngine.register(cookie);
+    fastifyEngine.register(session, {
+        secret: 'a-very-secret-key-that-should-be-long',
+        cookie: { secure: false }, // solo para dev
     });
+
+    fastifyEngine.registerReactApp('/app');
+
+    await fastifyEngine.registerModule(testModule);
+    await fastifyEngine.registerModule(authModule);
+    await fastifyEngine.registerModule(pbModule);
+    void fastifyEngine.start();
+});
