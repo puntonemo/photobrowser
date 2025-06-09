@@ -49,4 +49,48 @@ export class MediaItem {
     }, })
     metadataTs!: Date;
 
+
+    @Column('varchar', { name: 'location_label' })
+    locationLabel!: string;
+
+    @Column('varchar', { name: 'location_country_name' })
+    locationCountryName!: string;
+
+    @Column('varchar', { name: 'location_state' })
+    locationState!: string;
+
+    @Column('varchar', { name: 'location_county' })
+    locationCounty!: string;
+
+    @Column('varchar', { name: 'location_city' })
+    locationCity!: string;
+
+    @Column('varchar', { name: 'location_district' })
+    locationDistrict!: string;
+
+    @Column('varchar', { name: 'location_street' })
+    locationStreet!: string;
+
+    @Column('varchar', { name: 'location_house_number' })
+    locationHouseNumber!: string;
+
+    @Column('varchar', { name: 'location_postal_code' })
+    locationPostalCode!: string;
+
+    @Column('float', { name: 'location_latitude' })
+    locationLatitude!: number;
+
+    @Column('float', { name: 'location_longitude' })
+    locationLongitude!: number;
+    
+    @Column('timestamp', { name: 'location_ts', transformer: {
+        to(value) {
+            return value?.toISOString();
+        },
+        from(value) {
+            return value ? new Date(value) : undefined;
+        },
+    }, })
+    locationTs!: Date;
+
 }

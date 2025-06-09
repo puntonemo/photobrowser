@@ -1,0 +1,10 @@
+{
+    "type": "node",
+    "request": "launch",
+    "name": "Debug app",
+    "program": "${workspaceFolder}/dist/index.js", // o el entrypoint de tu app
+    "env": {
+        "PATH": "/home/dpascual/.nvm/versions/node/v20.11.1/bin:/opt/bin:/opt/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+        "NVM_DIR": "/home/dpascual/.nvm"
+    }
+}
