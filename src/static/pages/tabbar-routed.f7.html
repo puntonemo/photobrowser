@@ -1,0 +1,186 @@
+<!-- component template, uses same tagged template literals -->
+<template>
+
+  <div class="page view">
+    <div class="panel panel-left panel-init panel-cover side-tabs-panel panel-in-breakpoint" data-visible-breakpoint="768" style="position: fixed">
+      <div class="side-tab-links">
+        <a href="#tab-1" class="side-tab-link tab-link tab-link-active "><span class="material-symbols-outlined">home</span></a>
+        <a href="#tab-2" class="side-tab-link tab-link "><span class="material-symbols-outlined">favorite</span></a>
+        <a href="#tab-3" class="side-tab-link tab-link side-tab-link-active"><span class="material-symbols-outlined">shopping_cart</span></a>
+      </div>
+    </div>
+    <div class="navbar">
+      <div class="navbar-bg"></div>
+      <div class="navbar-inner sliding">
+        <div class="left">
+          <a class="link back">
+            <i class="icon icon-back"></i>
+            <span class="if-not-md">Back</span>
+          </a>
+        </div>
+        <div class="title">${pageTitle}</div>
+      </div>
+    </div>
+    <div class="toolbar toolbar-bottom tabbar">
+      <div class="toolbar-inner">
+        <a href="#tab-1" class="tab-link tab-link-active">Tab 1</a>
+        <a href="#tab-2" class="tab-link">Tab 2</a>
+        <a href="#tab-3" class="tab-link">Tab 3</a>
+      </div>
+    </div>
+    <div class="tabs">
+      <div id="tab-1" class="page-content tab tab-active">
+        <div class="block">
+          <p>Tab 1 content</p>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ullam enim quia molestiae facilis laudantium
+            voluptates obcaecati officia cum, sit libero commodi. Ratione illo suscipit temporibus sequi iure ad
+            laboriosam accusamus?</p>
+          <p>Saepe explicabo voluptas ducimus provident, doloremque quo totam molestias! Suscipit blanditiis eaque
+            exercitationem praesentium reprehenderit, fuga accusamus possimus sed, sint facilis ratione quod, qui
+            dignissimos voluptas! Aliquam rerum consequuntur deleniti.</p>
+          <p>Totam reprehenderit amet commodi ipsum nam provident doloremque possimus odio itaque, est animi culpa modi
+            consequatur reiciendis corporis libero laudantium sed eveniet unde delectus a maiores nihil dolores? Natus,
+            perferendis.</p>
+          <p>Atque quis totam repellendus omnis alias magnam corrupti, possimus aspernatur perspiciatis quae provident
+            consequatur minima doloremque blanditiis nihil maxime ducimus earum autem. Magni animi blanditiis similique
+            iusto, repellat sed quisquam!</p>
+          <p>Suscipit, facere quasi atque totam. Repudiandae facilis at optio atque, rem nam, natus ratione cum enim
+            voluptatem suscipit veniam! Repellat, est debitis. Modi nam mollitia explicabo, unde aliquid impedit!
+            Adipisci!</p>
+          <p>Deserunt adipisci tempora asperiores, quo, nisi ex delectus vitae consectetur iste fugiat iusto dolorem
+            autem. Itaque, ipsa voluptas, a assumenda rem, dolorum porro accusantium, officiis veniam nostrum cum cumque
+            impedit.</p>
+          <p>Laborum illum ipsa voluptatibus possimus nesciunt ex consequatur rem, natus ad praesentium rerum libero
+            consectetur temporibus cupiditate atque aspernatur, eaque provident eligendi quaerat ea soluta doloremque.
+            Iure fugit, minima facere.</p>
+        </div>
+      </div>
+      <div id="tab-2" class="page-content tab">
+        <div class="block">
+          <p>Tab 2 content</p>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ullam enim quia molestiae facilis laudantium
+            voluptates obcaecati officia cum, sit libero commodi. Ratione illo suscipit temporibus sequi iure ad
+            laboriosam accusamus?</p>
+          <p>Saepe explicabo voluptas ducimus provident, doloremque quo totam molestias! Suscipit blanditiis eaque
+            exercitationem praesentium reprehenderit, fuga accusamus possimus sed, sint facilis ratione quod, qui
+            dignissimos voluptas! Aliquam rerum consequuntur deleniti.</p>
+          <p>Totam reprehenderit amet commodi ipsum nam provident doloremque possimus odio itaque, est animi culpa modi
+            consequatur reiciendis corporis libero laudantium sed eveniet unde delectus a maiores nihil dolores? Natus,
+            perferendis.</p>
+          <p>Atque quis totam repellendus omnis alias magnam corrupti, possimus aspernatur perspiciatis quae provident
+            consequatur minima doloremque blanditiis nihil maxime ducimus earum autem. Magni animi blanditiis similique
+            iusto, repellat sed quisquam!</p>
+          <p>Suscipit, facere quasi atque totam. Repudiandae facilis at optio atque, rem nam, natus ratione cum enim
+            voluptatem suscipit veniam! Repellat, est debitis. Modi nam mollitia explicabo, unde aliquid impedit!
+            Adipisci!</p>
+          <p>Deserunt adipisci tempora asperiores, quo, nisi ex delectus vitae consectetur iste fugiat iusto dolorem
+            autem. Itaque, ipsa voluptas, a assumenda rem, dolorum porro accusantium, officiis veniam nostrum cum cumque
+            impedit.</p>
+          <p>Laborum illum ipsa voluptatibus possimus nesciunt ex consequatur rem, natus ad praesentium rerum libero
+            consectetur temporibus cupiditate atque aspernatur, eaque provident eligendi quaerat ea soluta doloremque.
+            Iure fugit, minima facere.</p>
+        </div>
+      </div>
+      <div id="tab-3" class="page-content tab">
+        <div class="block">
+          <p>Tab 3 content</p>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ullam enim quia molestiae facilis laudantium
+            voluptates obcaecati officia cum, sit libero commodi. Ratione illo suscipit temporibus sequi iure ad
+            laboriosam accusamus?</p>
+          <p>Saepe explicabo voluptas ducimus provident, doloremque quo totam molestias! Suscipit blanditiis eaque
+            exercitationem praesentium reprehenderit, fuga accusamus possimus sed, sint facilis ratione quod, qui
+            dignissimos voluptas! Aliquam rerum consequuntur deleniti.</p>
+          <p>Totam reprehenderit amet commodi ipsum nam provident doloremque possimus odio itaque, est animi culpa modi
+            consequatur reiciendis corporis libero laudantium sed eveniet unde delectus a maiores nihil dolores? Natus,
+            perferendis.</p>
+          <p>Atque quis totam repellendus omnis alias magnam corrupti, possimus aspernatur perspiciatis quae provident
+            consequatur minima doloremque blanditiis nihil maxime ducimus earum autem. Magni animi blanditiis similique
+            iusto, repellat sed quisquam!</p>
+          <p>Suscipit, facere quasi atque totam. Repudiandae facilis at optio atque, rem nam, natus ratione cum enim
+            voluptatem suscipit veniam! Repellat, est debitis. Modi nam mollitia explicabo, unde aliquid impedit!
+            Adipisci!</p>
+          <p>Deserunt adipisci tempora asperiores, quo, nisi ex delectus vitae consectetur iste fugiat iusto dolorem
+            autem. Itaque, ipsa voluptas, a assumenda rem, dolorum porro accusantium, officiis veniam nostrum cum cumque
+            impedit.</p>
+          <p>Laborum illum ipsa voluptatibus possimus nesciunt ex consequatur rem, natus ad praesentium rerum libero
+            consectetur temporibus cupiditate atque aspernatur, eaque provident eligendi quaerat ea soluta doloremque.
+            Iure fugit, minima facere.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<!-- component styles -->
+<style>
+  .side-tabs-panel {
+    --f7-panel-left-width: calc(64px + var(--f7-safe-area-left));
+    background: var(--f7-theme-color)
+  }
+
+  .side-tab-links {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 64px;
+    height: 100%;
+    margin-left: var(--f7-safe-area-left)
+  }
+
+  .side-tab-link {
+    width: 100%;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    opacity: .35
+  }
+
+  .ios .side-tab-link {
+    color: #fff
+  }
+
+  .md .side-tab-link {
+    color: var(--f7-md-on-primary)
+  }
+
+  .side-tab-link svg {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    width: 9px;
+    height: 64px;
+    margin-top: -32px;
+    transition-duration: .3s;
+    transform: scaleX(0);
+    transform-origin: left center;
+    fill: var(--f7-theme-color);
+    z-index: 100
+  }
+
+  .side-tab-link-active {
+    opacity: 1
+  }
+
+  .side-tab-link-active svg {
+    transform: scaleX(1)
+  }
+
+  .side-tab-link+.side-tab-link {
+    margin-top: 32px
+  }
+</style>
+<!-- rest of component logic -->
+<script>
+  // import ListItem from '/f7/pages/tabbar-routed-tab.jsx';
+  // create local component
+  const pageTitle = 'asd';
+  // const ListItem = (props, { $h }) => {
+  //   return () => $h`<li>${props.title}</li>`;
+  // }
+  // export main component
+  export default () => {
+    return $render;
+  }
+</script>

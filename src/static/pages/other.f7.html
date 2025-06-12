@@ -1,0 +1,76 @@
+<!-- component template, uses same tagged template literals -->
+<template>
+  <div class="page">
+    <div class="navbar">
+      <div class="navbar-bg"></div>
+      <div class="navbar-inner">
+        <div class="title">${title}</div>
+      </div>
+    </div>
+    <div class="page-content">
+      <div class="block margin-top">
+        <a @click=${openAlert} class="red-link">Open Alert</a>
+        <p>
+          <a @click=${home} class="button button-fill">Home</a>
+        </p>
+        <p>
+          <a @click=${back}>Back</a>
+        </p>
+        <div class="list simple-list">
+          <ul>
+            ${names.map((name) => $h`
+            <li>${name}</li>
+            `)}
+          </ul>
+        </div>
+        <div class="block-title">1 Slide Per View, 50px Between</div>
+        <swiper-container pagination class="swiper demo-swiper-multiple" space-between="50">
+          ${names.map((name) => $h`
+          <swiper-slide>${name}</swiper-slide>
+          `)}
+        </swiper-container>
+      </div>
+    </div>
+
+  </div>
+</template>
+<!-- component styles -->
+<style>
+  .red-link {
+    color: red;
+  }
+
+  .demo-swiper-multiple {
+    height: 100px;
+  }
+</style>
+<!-- rest of component logic -->
+<script>
+  // script must return/export component function
+  export default (props, { $f7, $on, $f7router }) => {
+    console.log('here');
+    const title = 'Component Page';
+    const names = ['John', 'Vladimir', 'Timo'];
+
+    const home = () => {
+      $f7router.navigate('/');
+    }
+    const back = () => {
+      $f7router.back();
+    }
+    const openAlert = () => {
+      $f7.dialog.alert('Hello world!');
+      back();
+    }
+
+    $on('pageInit', () => {
+      // do something on page init
+    });
+    $on('pageAfterOut', () => {
+      // page has left the view
+    });
+
+    // component function must return render function
+    return $render;
+  }
+</script>

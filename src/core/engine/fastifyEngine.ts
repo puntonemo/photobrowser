@@ -5,10 +5,10 @@ import { FastifyInstance, FastifyPluginAsync, FastifyRequest, FastifyReply } fro
 import fastifyStatic from '@fastify/static';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { createReadStream } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = path.dirname(__filename);
 
 const reactApp: FastifyPluginAsync = async (app) => {
     console.log('🔄 Iniciando FastifyStatic', path.join(__dirname, 'client'));
@@ -49,6 +49,21 @@ export class CoreFastifyRequest extends CoreRequest {
     }
     public redirect(url: string, status?: number) {
         this.res.redirect(url, status ?? 302);
+    }
+    public sendFile(absolutePath: string, mimeType: string) {
+        this.res.header('Content-Type', mimeType);
+
+        const stream = createReadStream(absolutePath);
+
+        // Manejar errores del stream para evitar enviar respuesta duplicada
+        stream.on('error', (err) => {
+            this.req.log.error(err);
+            if (!this.res.raw.headersSent) {
+                this.res.code(500).send({ error: 'Error al leer el archivo' });
+            }
+        });
+
+        return this.res.send(stream);
     }
 }
 
@@ -109,7 +124,18 @@ export class FastifyEngine {
         });
         console.log(`✅ Frontend serving at ${appPath}/`);
     }
-
+    async staticApp(folder: string, route: string) {
+        if (!this.fastify) return;
+        console.log('🔄 Iniciando staticApp', path.join(__dirname), folder, route);
+        this.fastify.register(fastifyStatic, {
+            root: path.join(__dirname, '..', 'dist', folder),
+            prefix: `${route}/`, // ruta pública
+            decorateReply: false,
+        });
+        await this.fastify.get(route, (_req, reply) => {
+            reply.redirect(`${route}/`);
+        });
+    }
     async start() {
         if (!this.fastify) return;
         try {
@@ -128,10 +154,10 @@ export class FastifyEngine {
             rep.code(500).send(error);
             return;
         });
-        if (response['result'] && response['result'] == 'error') {
+        if (response && response['result'] && response['result'] == 'error') {
             rep.code(response['status'] || 500).send(response);
         } else {
-            return response;
+            if (response) return response;
         }
     }
 }

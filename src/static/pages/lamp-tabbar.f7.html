@@ -1,0 +1,334 @@
+<!-- component template, uses same tagged template literals -->
+<template>
+    <div class="page">
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+                <div class="left">
+                    <a class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">${pageTitle}</div>
+            </div>
+        </div>
+        <div class="toolbar toolbar-bottom tabbar lamp-tabbar" style="--active-lamp-color: #0ff;backdrop-filter: blur(4px); background-color: #272931b0; filter: drop-shadow(0px 0px 14px #ffffff5c);">
+            <div class="toolbar-inner">
+                <a href="#tab-1" style="--lamp-color: #0ff;" class="tab-link tab-link-active"><span class="material-symbols-outlined">home</span><span class="tabbar-label">Home</span></a>
+                <a href="#tab-2" style="--lamp-color: #f0f;" class="tab-link"><span class="material-symbols-outlined">search</span><span class="tabbar-label">Search</span></a>
+                <a href="#tab-3" style="--lamp-color: #ff0;" class="tab-link"><span class="material-symbols-outlined">photo_album</span><span class="tabbar-label">Photos</span></a>
+            </div>
+        </div>
+        <!-- Begin -- Swippable tabs -->
+        <swiper-container class="tabs">
+            <swiper-slide id="tab-1" class="page-content tab tab-active">
+                <!-- Begin -- List View Accordion -->
+                <div class="block-title">List View Accordion</div>
+                <div class="list list-strong list-outline-ios list-dividers-ios inset-md accordion-list">
+                    <ul>
+                        <li class="accordion-item">
+                            <a class="item-link item-content">
+                                <div class="item-inner">
+                                    <div class="item-title">Lorem Ipsum</div>
+                                </div>
+                            </a>
+                            <div class="accordion-item-content" aria-hidden="true">
+                                <div class="block">
+                                    <p>
+                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean
+                                        elementum id
+                                        neque nec commodo. Sed vel
+                                        justo at turpis laoreet pellentesque quis sed lorem. Integer semper arcu
+                                        nibh,
+                                        non mollis arcu tempor
+                                        vel. Sed pharetra tortor vitae est rhoncus, vel congue dui sollicitudin.
+                                        Donec
+                                        eu arcu dignissim felis
+                                        viverra blandit suscipit eget ipsum.
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="accordion-item">
+                            <a class="item-link item-content">
+                                <div class="item-inner">
+                                    <div class="item-title">Nested List</div>
+                                </div>
+                            </a>
+                            <div class="accordion-item-content">
+                                <div class="list">
+                                    <ul>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-media"> <i class="icon icon-f7"></i>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title">Item 1</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-media"> <i class="icon icon-f7"></i>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title">Item 2</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <i class="icon icon-f7"></i>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title">Item 3</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <i class="icon icon-f7"></i>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title">Item 4</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="accordion-item">
+                            <a class="item-link item-content">
+                                <div class="item-inner">
+                                    <div class="item-title">Integer semper</div>
+                                </div>
+                            </a>
+                            <div class="accordion-item-content">
+                                <div class="block">
+                                    <p>
+                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean
+                                        elementum id
+                                        neque nec commodo. Sed vel
+                                        justo at turpis laoreet pellentesque quis sed lorem. Integer semper arcu
+                                        nibh,
+                                        non mollis arcu tempor
+                                        vel. Sed pharetra tortor vitae est rhoncus, vel congue dui sollicitudin.
+                                        Donec
+                                        eu arcu dignissim felis
+                                        viverra blandit suscipit eget ipsum.
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- End -- List View Accordion -->
+            </swiper-slide>
+            <swiper-slide id="tab-2" class="page-content tab">
+                <div class="block">
+                    <p>Tab 2 content</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ullam enim quia molestiae
+                        facilis laudantium
+                        voluptates obcaecati officia cum, sit libero commodi. Ratione illo suscipit temporibus
+                        sequi iure ad
+                        laboriosam accusamus?</p>
+                    <p>Saepe explicabo voluptas ducimus provident, doloremque quo totam molestias! Suscipit
+                        blanditiis eaque
+                        exercitationem praesentium reprehenderit, fuga accusamus possimus sed, sint facilis
+                        ratione quod, qui
+                        dignissimos voluptas! Aliquam rerum consequuntur deleniti.</p>
+                    <p>Totam reprehenderit amet commodi ipsum nam provident doloremque possimus odio itaque, est
+                        animi culpa modi
+                        consequatur reiciendis corporis libero laudantium sed eveniet unde delectus a maiores
+                        nihil dolores? Natus,
+                        perferendis.</p>
+                    <p>Atque quis totam repellendus omnis alias magnam corrupti, possimus aspernatur
+                        perspiciatis quae provident
+                        consequatur minima doloremque blanditiis nihil maxime ducimus earum autem. Magni animi
+                        blanditiis similique
+                        iusto, repellat sed quisquam!</p>
+                    <p>Suscipit, facere quasi atque totam. Repudiandae facilis at optio atque, rem nam, natus
+                        ratione cum enim
+                        voluptatem suscipit veniam! Repellat, est debitis. Modi nam mollitia explicabo, unde
+                        aliquid impedit!
+                        Adipisci!</p>
+                    <p>Deserunt adipisci tempora asperiores, quo, nisi ex delectus vitae consectetur iste fugiat
+                        iusto dolorem
+                        autem. Itaque, ipsa voluptas, a assumenda rem, dolorum porro accusantium, officiis
+                        veniam nostrum cum cumque
+                        impedit.</p>
+                    <p>Laborum illum ipsa voluptatibus possimus nesciunt ex consequatur rem, natus ad
+                        praesentium rerum libero
+                        consectetur temporibus cupiditate atque aspernatur, eaque provident eligendi quaerat ea
+                        soluta doloremque.
+                        Iure fugit, minima facere.</p>
+                </div>
+            </swiper-slide>
+            <swiper-slide id="tab-3" class="page-content tab">
+                <div class="block">
+                    <p>Tab 3 content</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ullam enim quia molestiae
+                        facilis laudantium
+                        voluptates obcaecati officia cum, sit libero commodi. Ratione illo suscipit temporibus
+                        sequi iure ad
+                        laboriosam accusamus?</p>
+                    <p>Saepe explicabo voluptas ducimus provident, doloremque quo totam molestias! Suscipit
+                        blanditiis eaque
+                        exercitationem praesentium reprehenderit, fuga accusamus possimus sed, sint facilis
+                        ratione quod, qui
+                        dignissimos voluptas! Aliquam rerum consequuntur deleniti.</p>
+                    <p>Totam reprehenderit amet commodi ipsum nam provident doloremque possimus odio itaque, est
+                        animi culpa modi
+                        consequatur reiciendis corporis libero laudantium sed eveniet unde delectus a maiores
+                        nihil dolores? Natus,
+                        perferendis.</p>
+                    <p>Atque quis totam repellendus omnis alias magnam corrupti, possimus aspernatur
+                        perspiciatis quae provident
+                        consequatur minima doloremque blanditiis nihil maxime ducimus earum autem. Magni animi
+                        blanditiis similique
+                        iusto, repellat sed quisquam!</p>
+                    <p>Suscipit, facere quasi atque totam. Repudiandae facilis at optio atque, rem nam, natus
+                        ratione cum enim
+                        voluptatem suscipit veniam! Repellat, est debitis. Modi nam mollitia explicabo, unde
+                        aliquid impedit!
+                        Adipisci!</p>
+                    <p>Deserunt adipisci tempora asperiores, quo, nisi ex delectus vitae consectetur iste fugiat
+                        iusto dolorem
+                        autem. Itaque, ipsa voluptas, a assumenda rem, dolorum porro accusantium, officiis
+                        veniam nostrum cum cumque
+                        impedit.</p>
+                    <p>Laborum illum ipsa voluptatibus possimus nesciunt ex consequatur rem, natus ad
+                        praesentium rerum libero
+                        consectetur temporibus cupiditate atque aspernatur, eaque provident eligendi quaerat ea
+                        soluta doloremque.
+                        Iure fugit, minima facere.</p>
+                </div>
+            </swiper-slide>
+            <swiper-slide id="tab-4" class="page-content tab">
+            </swiper-slide>
+        </swiper-container>
+        <!-- End -- Swippable tabs -->
+    </div>
+</template>
+<!-- component styles -->
+<style>
+:root {
+    --lamp-toolbar-duration: .4s;
+}
+.lamp-tabbar {
+    --f7-toolbar-inner-padding-left: 0px;
+    --f7-toolbar-inner-padding-right: 0px;
+    --f7-tabbar-icon-size: 24px;
+    overflow: hidden;
+    --computed-lamp-color: var( --active-lamp-color, var(--f7-tabbar-link-active-border-color, var(--f7-theme-color)) )
+}
+
+.lamp-tabbar .toolbar-inner {
+    overflow: visible
+}
+
+.md .tabbar i.icon:before,.md .tabbar-icons i.icon:before {
+    display: none
+}
+
+@media (max-width: 767px) {
+    .ios .lamp-tabbar {
+        --f7-tabbar-icon-size: 20px
+    }
+
+    .ios .lamp-tabbar.tabbar-icons .tab-link i.icon {
+        margin-bottom: 2px
+    }
+
+    .md .lamp-tabbar {
+        --f7-tabbar-icon-size: 24px
+    }
+}
+
+.lamp-tabbar .tab-link {
+    transition-duration: calc(var(--lamp-toolbar-duration) / 2)
+}
+
+.lamp-tabbar .tab-link-active {
+    transition-delay: calc(var(--lamp-toolbar-duration) / 2)
+}
+
+.theme-dark .lamp-tabbar .tab-link {
+    --f7-touch-ripple-color: rgba(255, 255, 255, .05)
+}
+
+.lamp-tabbar .tab-link-highlight {
+    display: block!important;
+    position: absolute;
+    background-color: transparent!important;
+    height: 4px!important;
+    transition-timing-function: cubic-bezier(.25,.1,.4,1.4);
+    transition-duration: var(--lamp-toolbar-duration)!important
+}
+
+.lamp-tabbar .tab-link-highlight:before {
+    --lamp-circle-color: var(--computed-lamp-color);
+    --lamp-circle-size: calc(var(--f7-toolbar-height) * 1.25);
+    content: "";
+    width: var(--lamp-circle-size);
+    height: var(--lamp-circle-size);
+    position: absolute;
+    left: 50%;
+    top: 0;
+    border-radius: 50%;
+    transform: translate(-50%) translateY(-50%) translateZ(0);
+    background-color: var(--lamp-circle-color);
+    opacity: .5;
+    transition-duration: var(--lamp-toolbar-duration);
+    -webkit-filter: blur(30px);
+    filter: blur(30px)
+}
+
+.lamp-tabbar .tab-link-highlight:after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    width: 32px;
+    height: 100%;
+    top: 0;
+    background-color: var(--computed-lamp-color);
+    transform: translate(-50%);
+    z-index: 100;
+    transition-duration: var(--lamp-toolbar-duration);
+    box-shadow: 0 0 2px var(--computed-lamp-color);
+    border-radius: 0 0 4px 4px
+}
+
+.lamp-tabbar .tab-link-active {
+    color: var( --lamp-color, var(--f7-tabbar-link-active-color, var(--f7-theme-color)) )
+}
+</style>
+<!-- rest of component logic -->
+<script>
+    // script must return/export component function
+    export default (props, { $f7, $on, $f7router }) => {
+        const pageTitle = "Lamp Tabbar"
+        $on('tabShow', (e) => {
+            const ele = document.querySelector(`[href='#${e.target.id}']`);
+            if(ele){
+                const color = ele.style.getPropertyValue('--lamp-color');
+                if(color){
+                    document.querySelector('.lamp-tabbar').style.setProperty('--active-lamp-color', color)
+                }
+            }
+        });
+        $on('pageInit', () => {
+            // do something on page init
+        });
+        $on('pageAfterOut', () => {
+            // page has left the view
+        });
+
+        // component function must return render function
+        return $render;
+    }
+</script>

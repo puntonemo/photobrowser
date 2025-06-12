@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Framework 7</title>
+    <link rel="stylesheet" href="https://cdn.framework7.io/packages/core/framework7-bundle.min.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+    </style>
+</head>
+
+<body>
+    <!-- App root element -->
+    <div id="app">
+        <!-- Your main view, should have "view-main" class -->
+        <div class="view view-main">
+            <div class="page-content">
+                <!-- Initial Page, "data-name" contains page name -->
+                <div data-name="home" class="page">
+                    <!-- Top Navbar -->
+                    <div class="navbar">
+                        <div class="navbar-bg"></div>
+                        <div class="navbar-inner">
+                            <div class="title">Framework7 App</div>
+                        </div>
+                    </div>
+
+                    <!-- Scrollable page content -->
+                    <div class="page-content">
+                        <div class="block margin-top">
+                            <p>Lorem Ipsum Dolor Amet ...</p>
+                            <div class="grid grid-cols-1 medium-grid-cols-3 grid-gap">
+                                <div><a href="/lamp-tabbar" class="button button-fill">Lamp Tabbar</a></div>
+                                <div><a href="/tabbar-routed/" class="button button-fill">Tabbar routed</a></div>
+                                <div><a href="/other" class="button button-fill">Profile page</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function docReady(fn) {
+            // see if DOM is already available
+            if (document.readyState === "complete" || document.readyState === "interactive") {
+                // call on next available tick
+                setTimeout(fn, 1);
+            } else {
+                document.addEventListener("DOMContentLoaded", fn);
+            }
+        }
+        docReady(function () {
+            // DOM is loaded and ready for manipulation here
+            console.log('hello f7')
+            /*
+            tabs: [
+                        {
+                            path: '/',
+                            id: 'tab1',
+                            content: 'Tab 1',
+                        },
+                        {
+                            path: '/tab2/',
+                            id: 'tab2',
+                            content: 'Tab 2',
+                        },
+                        {
+                            path: '/tab3/',
+                            id: 'tab3',
+                            content: 'Tab 3',
+                        },
+                    ],
+            */
+            const routes = [
+                {
+                    path: '/',
+                    url: '/f7/index.html',
+                    master: true
+                },
+                {
+                    name: 'lamp-tabbar',
+                    path: '/lamp-tabbar',
+                    transition: 'f7-push',
+                    componentUrl: 'pages/lamp-tabbar.f7.html',
+                },
+                {
+                    name: 'tabbar-routed',
+                    path: '/tabbar-routed/',
+                    componentUrl: '/f7/pages/tabbar-routed.f7.html',
+                },
+                {
+                    name: 'other',
+                    path: '/other',
+                    componentUrl: '/f7/pages/other.f7.html'
+                }
+            ];
+            var app = new Framework7({
+                // App root element
+                el: '#app',
+                theme: 'auto',
+                pushState: true,
+                view: {
+                    browserHistory: true
+                },
+                // App Name
+                name: 'My App',
+                // Enable swipe panel
+                panel: {
+                    swipe: true,
+                },
+                routes
+            });
+            var mainView = app.views.create('.view-main');
+        });
+    </script>
+    <script src="https://cdn.framework7.io/packages/core/framework7-bundle.min.js"></script>
+</body>
+
+</html>

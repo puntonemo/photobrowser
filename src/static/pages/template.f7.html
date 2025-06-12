@@ -1,0 +1,40 @@
+<!-- component template, uses same tagged template literals -->
+<template>
+    <div class="page">
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+                <div class="left">
+                    <a class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">${pageTitle}</div>
+            </div>
+        </div>
+        <div class="block margin-top">
+
+        </div>
+    </div>
+</template>
+<!-- component styles -->
+<style>
+
+</style>
+<!-- rest of component logic -->
+<script>
+    // script must return/export component function
+    export default (props, { $f7, $on, $f7router }) => {
+        const pageTitle = "My Kitchen Sink"
+        $on('pageInit', () => {
+            // do something on page init
+        });
+        $on('pageAfterOut', () => {
+            // page has left the view
+        });
+
+        // component function must return render function
+        return $render;
+    }
+</script>

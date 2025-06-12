@@ -62,6 +62,7 @@ AppDataSource.initialize().then(async () => {
     });
 
     fastifyEngine.registerReactApp('/app');
+    fastifyEngine.staticApp('static', '/f7')
 
     await fastifyEngine.registerModule(testModule);
     await fastifyEngine.registerModule(authModule);

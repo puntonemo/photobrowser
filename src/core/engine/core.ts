@@ -87,4 +87,5 @@ export abstract class CoreRequest {
     }
     public abstract get session();
     public abstract redirect(url: string, status?: number);
+    public abstract sendFile(absolutePath: string, mimeType: string);
 }
