@@ -11,13 +11,19 @@ export class MediaSource {
     @Column('varchar')
     path!: string;
 
-    @Column('timestamp', { name: 'last_scan', transformer: {
-        to(value) {
-            return value?.toISOString();
+    @Column('timestamp', {
+        name: 'last_scan',
+        transformer: {
+            to(value) {
+                return value?.toISOString();
+            },
+            from(value) {
+                return value ? new Date(value) : undefined;
+            },
         },
-        from(value) {
-            return value ? new Date(value) : undefined;
-        },
-    }, })
+    })
     lastScan!: Date;
+
+    @Column('bigint', { name: 'media_album_id' })
+    mediaAlbumId!: string;
 }

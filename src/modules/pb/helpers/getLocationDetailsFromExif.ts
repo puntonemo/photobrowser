@@ -1,4 +1,6 @@
 export interface LocationDetailsDto {
+    status: 'success';
+    status_message: string;
     label: string;
     countryCode: string;
     countryName: string;
@@ -12,6 +14,12 @@ export interface LocationDetailsDto {
     latitude: number;
     longitude: number;
     categories: string[];
+    rawResponse: any;
+}
+
+export interface LocationErrorDto {
+    status: 'error';
+    status_message: string;
 }
 
 const normalize = (text?: string): string | undefined => {
@@ -30,19 +38,21 @@ const parseDMS = (dms: string): number => {
     return decimal;
 };
 
-export async function getLocationDetailsFromExif(metadata: any): Promise<LocationDetailsDto | undefined> {
+const extract = (dms: string, ref: string) => {
+    const [deg, min, sec] = dms.match(/\d+(\.\d+)?/g)!.map(Number);
+    let decimal = deg + min / 60 + sec / 3600;
+    const dir = ref.trim().charAt(0).toUpperCase(); // N, S, E, W
+    if (dir === 'S' || dir === 'W') decimal *= -1;
+    return decimal;
+};
+
+export async function getLocationDetailsFromExif(metadata: any): Promise<LocationDetailsDto | LocationErrorDto> {
     const hereApiKey = process.env.HERE_API_KEY;
 
     let latitude: number;
     let longitude: number;
 
     if (metadata.GPSLatitude && metadata.GPSLongitude && metadata.GPSLatitudeRef && metadata.GPSLongitudeRef) {
-        const extract = (dms: string, ref: string) => {
-            const [deg, min, sec] = dms.match(/\d+(\.\d+)?/g)!.map(Number);
-            let decimal = deg + min / 60 + sec / 3600;
-            if (ref === 'S' || ref === 'W') decimal *= -1;
-            return decimal;
-        };
         latitude = extract(metadata.GPSLatitude, metadata.GPSLatitudeRef);
         longitude = extract(metadata.GPSLongitude, metadata.GPSLongitudeRef);
     } else if (metadata.GPSPosition) {
@@ -50,35 +60,50 @@ export async function getLocationDetailsFromExif(metadata: any): Promise<Locatio
         latitude = parseDMS(latStr);
         longitude = parseDMS(lonStr);
     } else {
-        return undefined;
+        return {
+            status: 'error',
+            status_message: 'Unable to get latitude/longitude',
+        };
     }
-
+    console.log('latitude', latitude);
+    console.log('longitude', longitude);
     const url = `https://revgeocode.search.hereapi.com/v1/revgeocode?at=${latitude},${longitude}&lang=es-ES&apiKey=${hereApiKey}`;
-
+    console.log(url);
     const res = await fetch(url);
-    if (!res.ok) throw new Error(`Error en la petición a HERE API: ${res.status} ${res.statusText}`);
+    if (!res.ok) {
+        return {
+            status: 'error',
+            status_message: `${res.status} ${res.statusText}`,
+        };
+    }
 
     const data = await res.json();
     if (!data.items || data.items.length === 0) {
-        return undefined;
+        return {
+            status: 'error',
+            status_message: 'Empty response',
+        };
     }
 
     const addr = data.items[0].address;
     const categories = data.items[0].categories ? data.items[0].categories.map((i) => i.name) : [];
 
     return {
-        label: normalize(addr.label)!,
+        status: 'success',
+        status_message: 'success',
+        label: addr.label!,
         countryCode: addr.countryCode!,
-        countryName: normalize(addr.countryName)!,
-        state: normalize(addr.state),
-        county: normalize(addr.county),
-        city: normalize(addr.city),
-        district: normalize(addr.district),
-        street: normalize(addr.street),
+        countryName: addr.countryName!,
+        state: addr.state,
+        county: addr.county,
+        city: addr.city,
+        district: addr.district,
+        street: addr.street,
         houseNumber: addr.houseNumber,
         postalCode: addr.postalCode,
         latitude,
         longitude,
         categories,
+        rawResponse: data,
     };
 }

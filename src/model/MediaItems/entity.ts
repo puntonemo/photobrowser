@@ -26,32 +26,74 @@ export class MediaItem {
     @Column('varchar')
     signature!: string;
 
-    @Column('timestamp', { name: 'created_at', transformer: {
-        to(value) {
-            return value?.toISOString();
+    @Column('timestamp', {
+        name: 'created_at',
+        transformer: {
+            to(value) {
+                return value?.toISOString();
+            },
+            from(value) {
+                return value ? new Date(value) : undefined;
+            },
         },
-        from(value) {
-            return value ? new Date(value) : undefined;
-        },
-    }, })
+    })
     lastScan: Date = new Date();
 
     @Column('json')
     metadata!: Record<string, any>;
 
-    @Column('timestamp', { name: 'metadata_ts', transformer: {
-        to(value) {
-            return value?.toISOString();
+    @Column('bigint', { name: 'file_size' })
+    fileSize!: number;
+
+    @Column('varchar', { name: 'file_size_string' })
+    fileSizeString!: string;
+
+    @Column('timestamp', {
+        name: 'moment_ts',
+        transformer: {
+            to(value) {
+                return value?.toISOString();
+            },
+            from(value) {
+                return value ? new Date(value) : undefined;
+            },
         },
-        from(value) {
-            return value ? new Date(value) : undefined;
+    })
+    momentTs!: Date;
+
+    @Column('varchar', { name: 'moment_year' })
+    momentYear!: string;
+
+    @Column('varchar', { name: 'moment_month' })
+    momentMonth!: string;
+
+    @Column('varchar', { name: 'moment_day' })
+    momentDay!: string;
+
+    @Column('timestamp', {
+        name: 'metadata_ts',
+        transformer: {
+            to(value) {
+                return value?.toISOString();
+            },
+            from(value) {
+                return value ? new Date(value) : undefined;
+            },
         },
-    }, })
+    })
     metadataTs!: Date;
 
+    @Column('json')
+    location!: string;
+
+    @Column('varchar', { name: 'location_status' })
+    locationStatus!: string;
 
     @Column('varchar', { name: 'location_label' })
     locationLabel!: string;
+
+    @Column('varchar', { name: 'location_country_code' })
+    locationCountryCode!: string;
 
     @Column('varchar', { name: 'location_country_name' })
     locationCountryName!: string;
@@ -82,15 +124,17 @@ export class MediaItem {
 
     @Column('float', { name: 'location_longitude' })
     locationLongitude!: number;
-    
-    @Column('timestamp', { name: 'location_ts', transformer: {
-        to(value) {
-            return value?.toISOString();
-        },
-        from(value) {
-            return value ? new Date(value) : undefined;
-        },
-    }, })
-    locationTs!: Date;
 
+    @Column('timestamp', {
+        name: 'location_ts',
+        transformer: {
+            to(value) {
+                return value?.toISOString();
+            },
+            from(value) {
+                return value ? new Date(value) : undefined;
+            },
+        },
+    })
+    locationTs!: Date;
 }
