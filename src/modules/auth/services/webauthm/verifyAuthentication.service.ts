@@ -1,9 +1,9 @@
 import { CoreService } from '@core';
-import { getUser } from '../../store/user';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/types';
 import type { WebAuthnCredential } from '@simplewebauthn/server';
 import { rpID, origin } from '../consts';
+import { Repositories } from 'model';
 
 const toBase64Url = (input: Buffer | string): string =>
     Buffer.isBuffer(input) ? input.toString('base64url') : Buffer.from(input).toString('base64url');
@@ -18,15 +18,15 @@ export const verifyAuthentication = new CoreService(
         const response = request.params as AuthenticationResponseJSON;
         const username = response.response.userHandle ? fromBase64Url(response.response.userHandle) : '';
         const expectedChallenge = request.session.challenge;
-        const user = getUser(username);
-        const dbCred = user?.credentials.find((cred) => cred.credentialID === response.rawId);
+        let user = await Repositories.Users.getOne({ username });
+        const dbCred = user?.credentials.find((cred) => cred.credentialId === response.rawId);
 
         if (!expectedChallenge || !dbCred) {
             return { verified: false };
         }
 
         const credential: WebAuthnCredential = {
-            id: toBase64Url(dbCred.credentialID),
+            id: toBase64Url(dbCred.credentialId),
             publicKey: Buffer.isBuffer(dbCred.publicKey) ? dbCred.publicKey : Buffer.from(dbCred.publicKey, 'base64'),
             counter: dbCred.counter,
             transports: dbCred.transports,
@@ -46,7 +46,7 @@ export const verifyAuthentication = new CoreService(
         request.session.challenge = undefined;
 
         if (verification.verified) {
-            request.session.auth = { username, displayName: user?.displayName };
+            request.session.auth = { ...user };
         } else {
             request.session.auth = undefined;
         }

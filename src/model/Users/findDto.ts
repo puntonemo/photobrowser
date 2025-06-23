@@ -1,3 +1,5 @@
 export class UsersFindDto {
-    id!: string
+    id!: string;
+    username!: string;
+    credentials!: boolean;
 }

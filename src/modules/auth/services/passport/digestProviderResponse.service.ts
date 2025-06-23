@@ -1,6 +1,6 @@
-import { CoreService, CoreRequest, responseError, HttpStatusCode } from '@core';
+import { CoreService, CoreRequest, responseError, HttpStatusCode, BadRequestResponseError } from '@core';
 import * as logic from '../../controllers/passport/digestProviderResponse.controller';
-import { addOrUpdateUser, getUser, hasUser } from '@modules/auth/store/user';
+import { Repositories } from 'model';
 
 export const digestProviderResponse = new CoreService(
     {
@@ -13,29 +13,32 @@ export const digestProviderResponse = new CoreService(
 
         request.session.passportAuthProviderResponse = providerResponse;
 
-        if (hasUser(providerResponse.profile.email)) {
-            const user = getUser(providerResponse.profile.email);
-            request.session.auth = { username: user?.username, displayName: user?.displayName };
-        } else {
-            const user = {
-                id: providerResponse.profile.email,
-                username: providerResponse.profile.email,
-                displayName: providerResponse.profile.displayName,
-                credentials: [],
-            };
+        if (providerResponse.profile.email) {
+            let user = await Repositories.Users.getOne({ username: providerResponse.profile.email, relations: true });
 
-            addOrUpdateUser(user);
-            request.session.auth = {
-                username: providerResponse.profile.email,
-                displayName: providerResponse.profile.displayName,
-            };
-        }
+            if (user) {
+                request.session.auth = { username: user?.username, displayName: user?.displayname };
+            } else {
+                const newUser = {
+                    username: providerResponse.profile.email,
+                    firstname: providerResponse.profile.firstname,
+                    lastname: providerResponse.profile.lastname,
+                    credentials: [],
+                };
 
-        if (request.origin == 'http' && request.headers['sec-fetch-mode'] == 'cors') {
-            return providerResponse;
+                user = await Repositories.Users.create(newUser);
+
+                request.session.auth = { ...user };
+            }
+
+            if (request.origin == 'http' && request.headers['sec-fetch-mode'] == 'cors') {
+                return providerResponse;
+            } else {
+                request.redirect(providerResponse.state.redirect_uri);
+                return providerResponse;
+            }
         } else {
-            request.redirect(providerResponse.state.redirect_uri);
-            return providerResponse;
+            throw BadRequestResponseError();
         }
     },
 );

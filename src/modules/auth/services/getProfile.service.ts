@@ -1,4 +1,4 @@
-import { CoreService } from '@core';
+import { CoreService, UnauthorizedResponseError } from '@core';
 
 export const getProfile = new CoreService(
     {
@@ -7,6 +7,6 @@ export const getProfile = new CoreService(
     async (request) => {
         if (request.session.auth !== undefined) {
             return request.session.auth;
-        } else throw { status: 'unauthohorized' };
+        } else throw UnauthorizedResponseError();
     },
 );

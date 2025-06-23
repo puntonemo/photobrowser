@@ -4,7 +4,7 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "lt": "lt --port 3000 --subdomain davidpascual",
+    "lt": "lt --port 4000 --subdomain davidpascual",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "build:client": "tsx build-client.ts",

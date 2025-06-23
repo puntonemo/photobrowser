@@ -1,7 +1,7 @@
-import { CoreService } from '@core';
-import { addOrUpdateUser, hasUser } from '../../store/user';
+import { CoreService, UnauthorizedResponseError } from '@core';
 import { generateRegistrationOptions } from '@simplewebauthn/server';
 import { rpID, rpName } from '../consts';
+import { Repositories } from 'model';
 
 export const registrationOptions = new CoreService(
     {
@@ -11,16 +11,20 @@ export const registrationOptions = new CoreService(
         const { username } = request.params;
         const userID = Buffer.from(username, 'utf8');
 
-        if (!hasUser(username)) {
-            addOrUpdateUser({ id: username, username, displayName: 'Nombre de usuario', credentials: [] });
-        }
+        let user = await Repositories.Users.getOne({ username });
+
+        // if (!hasUser(username)) {
+        //     addOrUpdateUser({ id: username, username, displayName: 'Nombre de usuario', credentials: [] });
+        // }
+
+        if(!user) throw UnauthorizedResponseError();
 
         const options = await generateRegistrationOptions({
             rpName,
             rpID,
             userID,
             userName: username,
-            userDisplayName: 'Nombre de usuario',
+            userDisplayName: user.displayname,
             attestationType: 'none',
             authenticatorSelection: {
                 userVerification: 'required',

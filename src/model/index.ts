@@ -1,7 +1,8 @@
 import { DataSource } from 'typeorm';
-import { GenericRepository } from './generic';
-
-import { User, UsersFindDto } from './Users';
+import { GenericRepository } from './_gen/repository';
+import * as entities from './entities';
+import { User, UsersFindDto, UsersRepositoryOptions } from './Users';
+import { UserCredential, UserCredentialsFindDto } from './UserCredentials';
 import { MediaItem, MediaItemFindDto } from './MediaItems';
 import { MediaSource, MediaSourceFindDto } from './MediaSources';
 import { MediaItemTag, MediaItemTagFindDto } from './MediaItemTags';
@@ -10,6 +11,7 @@ import { MediaAlbumItem, MediaAlbumItemFindDto } from './MediaAlbumItems';
 
 export const Repositories: {
     Users: GenericRepository<User, UsersFindDto>;
+    UserCredentials: GenericRepository<UserCredential, UserCredentialsFindDto>;
     MediaSources: GenericRepository<MediaSource, MediaSourceFindDto>;
     MediaItems: GenericRepository<MediaItem, MediaItemFindDto>;
     MediaItemTags: GenericRepository<MediaItemTag, MediaItemTagFindDto>;
@@ -21,8 +23,12 @@ export const Repositories: {
  * TYPEORM REPOSITORIES INITIALIZATION
  * @param AppDataSource DataSource
  */
-export function AppDataSourceInit(dataSource: DataSource) {
-    Repositories.Users = new GenericRepository<User, UsersFindDto>(dataSource, User);
+function RepositoriesInit(dataSource: DataSource) {
+    Repositories.Users = new GenericRepository<User, UsersFindDto>(dataSource, User, UsersRepositoryOptions);
+    Repositories.UserCredentials = new GenericRepository<UserCredential, UserCredentialsFindDto>(
+        dataSource,
+        UserCredential,
+    );
     Repositories.MediaSources = new GenericRepository<MediaSource, MediaSourceFindDto>(dataSource, MediaSource);
     Repositories.MediaItems = new GenericRepository<MediaItem, MediaItemFindDto>(dataSource, MediaItem);
     Repositories.MediaItemTags = new GenericRepository<MediaItemTag, MediaItemTagFindDto>(dataSource, MediaItemTag);
@@ -31,4 +37,38 @@ export function AppDataSourceInit(dataSource: DataSource) {
         dataSource,
         MediaAlbumItem,
     );
+}
+
+export type AppDataSourceInitOptionsType = {
+    type: 'mysql' | 'mariadb' | 'postgres' | 'sqlite' | 'mssql' | 'sap' | 'oracle' | 'mongodb' | 'spanner';
+    hostname: string;
+    port: number;
+    username: string;
+    password: string;
+    database: string;
+    dbLogging: boolean;
+};
+export function AppDataSourceInit(options: AppDataSourceInitOptionsType): Promise<DataSource> {
+    const { type, hostname, port, username, password, database, dbLogging } = options;
+    console.log(options);
+    return new Promise((resolve, reject) => {
+        console.debug(`AppDataSourceInit: ${type}://${username}:${password}@${hostname}:${port}/${database}`);
+        const AppDataSource = new DataSource({
+            type,
+            host: hostname,
+            port: port,
+            username: username,
+            password: password,
+            database: database,
+            synchronize: false,
+            logging: dbLogging,
+            entities: entities,
+        });
+        AppDataSource.initialize()
+            .then((dataSource) => {
+                RepositoriesInit(dataSource);
+                resolve(dataSource);
+            })
+            .catch(reject);
+    });
 }

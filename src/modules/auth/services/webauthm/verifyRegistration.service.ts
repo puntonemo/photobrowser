@@ -1,7 +1,6 @@
 import { CoreService } from '@core';
-import { addOrUpdateUser, getUser } from '../../store/user';
 import { verifyRegistrationResponse } from '@simplewebauthn/server';
-
+import { Repositories } from 'model';
 import type { RegistrationResponseJSON } from '@simplewebauthn/server';
 import { rpID, origin } from '../consts';
 
@@ -20,12 +19,13 @@ export const verifyRegistration = new CoreService(
         }
         const body = request.params as RegistrationResponseJSON;
         const expectedChallenge = body.response.clientDataJSON && extractChallenge(body.response.clientDataJSON);
+        
         const username = request.session.username;
-        const user = getUser(username);
+        if (!username) return { verified: false };
 
-        if (!username || !user) {
-            return { verified: false };
-        }
+        let user = await Repositories.Users.getOne({ username });
+
+        if (!user) return { verified: false };
 
         const verification = await verifyRegistrationResponse({
             response: body,
@@ -34,26 +34,24 @@ export const verifyRegistration = new CoreService(
             expectedRPID: rpID,
         });
 
-        if (verification.verified) {
-            const user = getUser(username);
-            if (user) {
-                user?.credentials.push({
-                    credentialID: verification.registrationInfo?.credential?.id,
-                    publicKey: verification.registrationInfo?.credential?.publicKey
-                        ? Buffer.from(verification.registrationInfo.credential.publicKey).toString('base64')
-                        : '',
-                    counter: verification.registrationInfo?.credential?.counter,
-                    transports: verification.registrationInfo?.credential?.transports,
-                });
-                addOrUpdateUser(user);
-            }
+        if (verification.verified && verification.registrationInfo && verification.registrationInfo.credential) {
+            await Repositories.UserCredentials.create({
+                userId: user.id,
+                user: user,
+                credentialId: verification.registrationInfo.credential.id,
+                publicKey: verification.registrationInfo.credential.publicKey
+                    ? Buffer.from(verification.registrationInfo.credential.publicKey).toString('base64')
+                    : '',
+                counter: verification.registrationInfo.credential.counter,
+                transports: verification.registrationInfo.credential.transports,
+            });
         }
 
         request.session.username = undefined;
         request.session.challenge = undefined;
 
         if (verification.verified) {
-            request.session.auth = { username, displayName: user?.displayName };
+            request.session.auth = { ...user };
         } else {
             request.session.auth = undefined;
         }

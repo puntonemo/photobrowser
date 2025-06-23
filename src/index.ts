@@ -9,8 +9,6 @@ import { FastifyEngine } from '@core';
 import { testModule } from '@modules/test';
 import { authModule } from '@modules/auth';
 import { pbModule } from '@modules/pb';
-import { DataSource } from 'typeorm';
-import * as entities from './model/entities';
 import { AppDataSourceInit } from './model';
 
 // __dirname en ESM
@@ -25,34 +23,41 @@ if (fs.existsSync(envSpecific)) {
 }
 
 const dbConnection = process.env.DB_CONNECTION;
-const dbType = process.env.DB_CONNECTION;
 const dbLogging = process.env.DB_LOGGING === 'true';
 
-if (!dbConnection || !dbType) {
+if (!dbConnection) {
     console.log('NO DB CONNECTION!');
     process.exit(1);
 }
 
-const { hostname, port, username, password, pathname } = new URL(dbConnection);
+const { protocol, hostname, port, username, password, pathname } = new URL(dbConnection);
 
 const database = pathname.slice(1);
 
-export const AppDataSource = new DataSource({
-    type: 'mariadb',
-    host: decodeURIComponent(hostname),
+const dbType = protocol.slice(0, -1) as
+    | 'mysql'
+    | 'mariadb'
+    | 'postgres'
+    | 'sqlite'
+    | 'mssql'
+    | 'sap'
+    | 'oracle'
+    | 'mongodb'
+    | 'spanner';
+
+const AppDataSourceInitOptions = {
+    type: dbType,
+    hostname: decodeURIComponent(hostname),
     port: parseInt(port),
     username: decodeURIComponent(username),
     password: decodeURIComponent(password),
     database: decodeURIComponent(database),
     synchronize: false,
-    logging: dbLogging,
-    entities: entities,
-});
+    dbLogging,
+};
 
 // await fastifyEngine.compileReactApp();
-AppDataSource.initialize().then(async () => {
-    AppDataSourceInit(AppDataSource);
-
+AppDataSourceInit(AppDataSourceInitOptions).then(async () => {
     const fastifyEngine = new FastifyEngine();
 
     fastifyEngine.register(cookie);
@@ -62,7 +67,7 @@ AppDataSource.initialize().then(async () => {
     });
 
     fastifyEngine.registerReactApp('/app');
-    fastifyEngine.staticApp('static', '/f7')
+    fastifyEngine.staticApp('static', '/f7');
 
     await fastifyEngine.registerModule(testModule);
     await fastifyEngine.registerModule(authModule);

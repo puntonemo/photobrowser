@@ -1,8 +1,7 @@
 import { CoreService } from '@core';
-import { getUser, hasUser, userStore } from '../../store/user';
 import { generateAuthenticationOptions } from '@simplewebauthn/server';
-
 import { rpID } from '../consts';
+import { Repositories } from 'model';
 
 export const generateOptions = new CoreService(
     {
@@ -13,15 +12,14 @@ export const generateOptions = new CoreService(
 
         let allowCredentials: any[] = [];
 
-        if (username && hasUser(username)) {
-            const user = getUser(username);
-            if (user)
-                allowCredentials = user.credentials.map((cred) => ({
-                    id: cred.credentialID,
-                    type: 'public-key',
-                    transports: cred.transports,
-                }));
-        }
+        let user = await Repositories.Users.getOne({ username, credentials: true });
+
+        if (user && user.credentials)
+            allowCredentials = user.credentials.map((cred) => ({
+                id: cred.credentialId,
+                type: 'public-key',
+                transports: cred.transports,
+            }));
 
         const options = await generateAuthenticationOptions({
             rpID,

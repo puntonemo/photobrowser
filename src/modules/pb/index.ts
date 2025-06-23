@@ -21,8 +21,8 @@ export const pbModule = new CoreModule('pb', services, {
 
         const mediaSources = await Repositories.MediaSources.find({});
 
-        if (mediaSources && mediaSources.length > 0) {
-            for (const mediaSource of mediaSources) {
+        if (mediaSources && mediaSources.data && mediaSources.data.length > 0) {
+            for (const mediaSource of mediaSources.data) {
                 console.log('Adding watcher to MediaSource', mediaSource.id, mediaSource.path);
 
                 const watcher = chokidar.watch(mediaSource.path, {

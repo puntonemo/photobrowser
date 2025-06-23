@@ -1,5 +1,5 @@
 import { CoreService } from '@core';
-import { getUser } from '../store/user';
+import { Repositories } from 'model';
 import { BadRequestResponseError } from 'core/engine/responseError';
 import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { sendPinCode } from '../helpers';
@@ -13,7 +13,7 @@ export const signin = new CoreService(
 
         if (!email) return BadRequestResponseError();
 
-        const user = getUser(email);
+        let user = await Repositories.Users.getOne({ username: email });
 
         const signinChallenge = isoBase64URL.fromUTF8String(email);
 
@@ -25,7 +25,7 @@ export const signin = new CoreService(
             request.session.pinCode = pinCode;
             request.session.challenge = signinChallenge;
 
-            sendPinCode(email, user.displayName, pinCode, language);
+            sendPinCode(email, user.displayname, pinCode, language);
 
             return { challenge: signinChallenge };
         } else {
@@ -38,7 +38,7 @@ export const signin = new CoreService(
 
             request.session.pinCode = undefined;
             request.session.challenge = undefined;
-            request.session.auth = { username: email, displayName: user?.displayName };
+            request.session.auth = { ...user };
 
             return { result: 'success' };
         }

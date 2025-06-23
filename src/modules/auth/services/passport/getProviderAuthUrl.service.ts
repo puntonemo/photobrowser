@@ -28,7 +28,7 @@ export const getProviderAuthUrl = new CoreService(
             deviceId?.toString(),
             redirectUriBase,
         );
-        ///api/passport/authUrl/google?state={}&redirect_uri=/home
+        //api/auth/passport/authUrl/google?state={}&redirect_uri=/home
         ///api/passport/authUrl/live?state={}&redirect_uri=/home
         ///api/passport/authUrl/twitter?state={}&redirect_uri=/home
         ///api/passport/response/google

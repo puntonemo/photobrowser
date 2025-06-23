@@ -1,5 +1,5 @@
 import { CoreService } from '@core';
-import { addOrUpdateUser, hasUser } from '../store/user';
+import { Repositories } from 'model';
 import { BadRequestResponseError } from 'core/engine/responseError';
 import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { sendPinCode } from '../helpers';
@@ -38,16 +38,20 @@ export const signup = new CoreService(
             request.session.pinCode = undefined;
             request.session.challenge = undefined;
 
-            if (hasUser(email)) return BadRequestResponseError('alreadyExisting');
+            //if (hasUser(email)) return BadRequestResponseError('alreadyExisting');
+            if (await Repositories.Users.exists({ username: email })) return BadRequestResponseError('alreadyExisting');
 
-            const user = {
-                id: email,
+            const user = await Repositories.Users.create({
                 username: email,
-                displayName,
-                credentials: [],
-            };
+                firstname,
+                lastname,
+                profile: {
+                    language,
+                },
+            });
 
-            addOrUpdateUser(user);
+            request.session.auth = { ...user };
+
             return { result: 'succcess' };
         }
     },

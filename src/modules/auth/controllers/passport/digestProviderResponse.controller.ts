@@ -4,7 +4,7 @@ type StandarizedUserProfile = {
     id: string;
     firstname: string;
     lastname: string;
-    displayName: string;
+    displayname: string;
     email?: string;
     username: string;
     picture: string | null;
@@ -13,7 +13,12 @@ type StandarizedUserProfile = {
 
 const PASSPORT_STATE_EXPIRES_ON_SECS = Number.parseInt(process.env.PASSPORT_STATE_EXPIRES_ON_SECS ?? '60');
 
-export const digestProviderResponse = async (request: Record<string, any>) => {
+export const digestProviderResponse = async (
+    request: Record<string, any>,
+): Promise<{
+    profile: StandarizedUserProfile;
+    state: any;
+}> => {
     var state = request.state;
     if (request.state) {
         state = decrypt(request.state);
@@ -231,7 +236,7 @@ const getTwitterTokens = (code: string, redirectUriBase: string) =>
                 }
             });
     });
-const getUserProfile = (token: Record<string, any>) =>
+const getUserProfile = (token: Record<string, any>): Promise<StandarizedUserProfile> =>
     new Promise((resolve, reject) => {
         //console.log('getUserProfile->%o', token.provider);
         switch (token.provider) {
@@ -334,7 +339,7 @@ const standarizeUserProfile = (profile: Record<string, any>) => {
                 id: profile.id,
                 firstname: profile.given_name,
                 lastname: profile.family_name,
-                displayName: profile.name,
+                displayname: profile.name,
                 email: profile.email,
                 username: profile.email,
                 picture: profile.picture,
@@ -346,7 +351,7 @@ const standarizeUserProfile = (profile: Record<string, any>) => {
                 id: profile.id,
                 firstname: profile.givenName,
                 lastname: profile.surname,
-                displayName: profile.displayName,
+                displayname: profile.displayName,
                 email: profile.userPrincipalName,
                 username: profile.userPrincipalName,
                 picture: null,
@@ -358,7 +363,7 @@ const standarizeUserProfile = (profile: Record<string, any>) => {
                 id: profile.id,
                 firstname: profile.first_name,
                 lastname: profile.last_name,
-                displayName: profile.name,
+                displayname: profile.name,
                 email: profile.email,
                 username: profile.email,
                 picture: `https://graph.facebook.com/${profile.id}/picture`, //?height=500 --> https://developers.facebook.com/docs/graph-api/reference/user/picture/?locale=es_ES
@@ -370,7 +375,7 @@ const standarizeUserProfile = (profile: Record<string, any>) => {
                 id: profile.id,
                 firstname: splitName[0],
                 lastname: splitName.length > 1 ? splitName[1] : '',
-                displayName: profile.name,
+                displayname: profile.name,
                 email: undefined,
                 username: profile.username,
                 picture: profile.profile_image_url,
