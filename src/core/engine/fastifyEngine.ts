@@ -1,11 +1,12 @@
 import Fastify, { FastifyRegister } from 'fastify';
-import { CoreModule, CoreRequest, CoreService } from './core';
+import { CoreModule, CoreRequest, CoreRequestManager, CoreService } from './core';
 import { FastifySessionObject } from '@fastify/session';
 import { FastifyInstance, FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify';
 import fastifyStatic from '@fastify/static';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createReadStream } from 'fs';
+import { InternalServerErrorResponseError, UnauthorizedResponseError } from './responseError';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -69,10 +70,12 @@ export class CoreFastifyRequest extends CoreRequest {
 
 export class FastifyEngine {
     private _serviceDict: Record<string, CoreService> = {};
+    private globalRequestManagers: CoreRequestManager[];
     public register: FastifyRegister = () => {};
     constructor(private fastify?: FastifyInstance) {
         this.fastify = fastify || Fastify();
         this.register = this.fastify.register;
+        this.globalRequestManagers = [];
     }
 
     private registerService(module: CoreModule, name: string, coreService: CoreService) {
@@ -106,10 +109,21 @@ export class FastifyEngine {
             if (service[1].constructor.name === CoreService.name) this.registerService(module, service[0], service[1]);
         }
     }
+    async registerGlobalRequestManager(requestManager: CoreRequestManager) {
+        this.globalRequestManagers.push(requestManager);
+    }
     async registerModule(module: CoreModule) {
         this.registerServices(module, module.services);
         if (module.options?.init) {
             await module.options.init();
+        }
+        if (module.options?.globalRequestManagers) {
+            const globalRequestManagers = Array.isArray(module.options.globalRequestManagers)
+                ? module.options.globalRequestManagers
+                : [module.options.globalRequestManagers];
+            for (const globalRequestManager of globalRequestManagers) {
+                this.registerGlobalRequestManager(globalRequestManager);
+            }
         }
     }
     async registerReactApp(appPath = '/app') {
@@ -149,15 +163,27 @@ export class FastifyEngine {
         }
     }
     private async handler(req: FastifyRequest, rep: FastifyReply, service: CoreService) {
+        let response: Record<string, any> | undefined | void = undefined;
         const frequest = new CoreFastifyRequest(req, rep);
-        const response = await service.manager(frequest).catch((error) => {
-            rep.code(500).send(error);
-            return;
-        });
+        for (const requestManager of this.globalRequestManagers) {
+            if (response) break;
+            const requestManagerResponse = await requestManager(frequest, service);
+            if (requestManagerResponse === true) continue;
+            if (requestManagerResponse === false) {
+                response = UnauthorizedResponseError();
+                break;
+            }
+            response = requestManagerResponse;
+        }
+        if (!response)
+            response = await service.manager(frequest).catch((error) => {
+                return InternalServerErrorResponseError(error);
+            });
         if (response && response['result'] && response['result'] == 'error') {
             rep.code(response['status'] || 500).send(response);
         } else {
             if (response) return response;
         }
+        return;
     }
 }

@@ -68,6 +68,7 @@ export class CoreService {
 }
 interface CoreModuleOptions {
     init: () => Promise<void>;
+    globalRequestManagers?: CoreRequestManager | CoreRequestManager[] //| Record<string, CoreRequestManager>
 }
 export class CoreModule {
     constructor(
@@ -89,3 +90,4 @@ export abstract class CoreRequest {
     public abstract redirect(url: string, status?: number);
     public abstract sendFile(absolutePath: string, mimeType: string);
 }
+export type CoreRequestManager = (request: CoreRequest, service?: CoreService) => Record<string, any> | Promise<Record<string, any>> | boolean | Promise<boolean> | void;
