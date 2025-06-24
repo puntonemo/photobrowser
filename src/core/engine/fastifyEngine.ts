@@ -116,7 +116,10 @@ export class FastifyEngine {
     }
     async registerModule(module: CoreModule) {
         this._moduleDict[module.name] = module;
-        this.registerServices(module, module.services);
+        if (module.options?.services) {
+            this.registerServices(module, module.options.services);
+        }
+        
         if (module.options?.init) {
             await module.options.init();
         }

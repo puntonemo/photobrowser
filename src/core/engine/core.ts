@@ -67,14 +67,14 @@ export class CoreService {
     }
 }
 interface CoreModuleOptions {
-    init: () => Promise<void>;
+    services?: Record<string, CoreService>,
+    init?: () => Promise<void>;
     globalInterceptor?: CoreRequestInterceptor | CoreRequestInterceptor[]; //| Record<string, CoreRequestInterceptor>
     interceptor?: CoreRequestInterceptor | CoreRequestInterceptor[]; //| Record<string, CoreRequestInterceptor>
 }
 export class CoreModule {
     constructor(
         public name: string,
-        public services: Record<string, CoreService>,
         public options?: CoreModuleOptions,
     ) {}
 }

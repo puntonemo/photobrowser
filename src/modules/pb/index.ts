@@ -9,7 +9,8 @@ export const videoExtensions = ['mp4', 'mov'];
 export const imageExtensions = ['jpg', 'jpeg', 'png', 'heic'];
 export const watchers = new Map<string, FSWatcher>();
 
-export const pbModule = new CoreModule('pb', services, {
+export const pbModule = new CoreModule('pb', {
+    services,
     init: async () => {
         console.log('photobrowser module init');
         const rootPath = '/home/david/Test';
