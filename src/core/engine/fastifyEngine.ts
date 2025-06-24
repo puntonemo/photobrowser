@@ -172,8 +172,9 @@ export class FastifyEngine {
         if (!this.fastify) return;
         try {
             const PORT = +(process.env.PORT ?? 3000);
-            await this.fastify.listen({ port: PORT, host: '0.0.0.0' });
-            console.log(`Servidor escuchando en ${PORT}`);
+            const HOST = process.env.HOST ?? '0.0.0.0'
+            await this.fastify.listen({ port: PORT, host: HOST });
+            console.log(`Servidor escuchando en ${HOST}:${PORT}`);
         } catch (err) {
             this.fastify.log.error(err);
 
