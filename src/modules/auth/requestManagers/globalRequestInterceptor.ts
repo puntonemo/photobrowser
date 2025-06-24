@@ -10,6 +10,7 @@ export function globalRequestInterceptor(
         service.manager.serviceName,
         service.manager.name,
     );
+    request.params = { ...request.params, globallyManaged: true };
     if (!request.session.viewCount || request.session.viewCount < 3) return true;
     if (request.session.viewCount >= 3 && request.session.viewCount < 5) {
         request.session.viewCount++;

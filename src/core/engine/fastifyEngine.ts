@@ -1,12 +1,12 @@
 import Fastify, { FastifyRegister } from 'fastify';
-import { CoreModule, CoreRequest, CoreRequestInterceptor, CoreRequestManager, CoreService } from './core';
+import { CoreModule, CoreRequest, CoreRequestInterceptor, CoreService } from './core';
 import { FastifySessionObject } from '@fastify/session';
 import { FastifyInstance, FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify';
 import fastifyStatic from '@fastify/static';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createReadStream } from 'fs';
-import { InternalServerErrorResponseError, UnauthorizedResponseError } from './responseError';
+import { UnauthorizedResponseError } from './responseError';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -71,14 +71,12 @@ export class CoreFastifyRequest extends CoreRequest {
 export class FastifyEngine {
     private _serviceDict: Record<string, CoreService> = {};
     private _moduleDict: Record<string, CoreModule> = {};
-    private requestManagers: CoreRequestManager[];
     private interceptors: CoreRequestInterceptor[];
 
     public register: FastifyRegister = () => {};
     constructor(private fastify?: FastifyInstance) {
         this.fastify = fastify || Fastify();
         this.register = this.fastify.register;
-        this.requestManagers = [];
         this.interceptors = [];
     }
 
@@ -113,9 +111,6 @@ export class FastifyEngine {
             if (service[1].constructor.name === CoreService.name) this.registerService(module, service[0], service[1]);
         }
     }
-    async registerRequestManager(requestManager: CoreRequestManager) {
-        this.requestManagers.push(requestManager);
-    }
     async registerInterceptor(requestInterceptor: CoreRequestInterceptor) {
         this.interceptors.push(requestInterceptor);
     }
@@ -125,15 +120,7 @@ export class FastifyEngine {
         if (module.options?.init) {
             await module.options.init();
         }
-        /** MANAGE GLOBAL REQUEST MANAGERS */
-        if (module.options?.globalRequestManager) {
-            const globalRequestManagers = Array.isArray(module.options.globalRequestManager)
-                ? module.options.globalRequestManager
-                : [module.options.globalRequestManager];
-            for (const globalRequestManager of globalRequestManagers) {
-                this.registerRequestManager(globalRequestManager);
-            }
-        }
+
         /** MANAGE GLOBAL REQUEST INTERCEPTORS */
         if (module.options?.globalInterceptor) {
             const globalInterceptors = Array.isArray(module.options.globalInterceptor)
@@ -188,38 +175,11 @@ export class FastifyEngine {
         if (!module) console.warn(`MODULE '${service.manager.moduleName}' NOT FOUND!`);
 
         const frequest = new CoreFastifyRequest(req, rep);
-        /** MANAGE GLOBAL REQUEST MANAGERS */
-        for (const requestManager of this.requestManagers) {
-            //frequest is passed ByRef, so any change in the manager will be reflected here
-            await requestManager(frequest, service);
-        }
-
-        /** MANAGE MODULE REQUEST MANAGERS */
-        if (module && module.options?.requestManager) {
-            const moduleRequestManagers = Array.isArray(module.options.requestManager)
-                ? module.options.requestManager
-                : [module.options.requestManager];
-
-            for (const requestManager of moduleRequestManagers) {
-                //frequest is passed ByRef, so any change in the manager will be reflected here
-                await requestManager(frequest, service);
-            }
-        }
-
-        /** MANAGE SERVICE REQUEST MANAGERS */
-        if (service.manager.requestManager) {
-            const serviceRequestManagers = Array.isArray(service.manager.requestManager)
-                ? service.manager.requestManager
-                : [service.manager.requestManager];
-            for (const requestManager of serviceRequestManagers) {
-                //frequest is passed ByRef, so any change in the manager will be reflected here
-                await requestManager(frequest, service);
-            }
-        }
 
         /** MANAGE GLOBAL INTERCEPTORS */
         for (const interceptor of this.interceptors) {
             if (response) break;
+            //frequest is passed ByRef, so any change in the interceptor will be reflected here
             const interceptorResponse = await interceptor(frequest, service);
 
             if (interceptorResponse === true) continue;
@@ -230,7 +190,7 @@ export class FastifyEngine {
             response = interceptorResponse;
         }
 
-        /** MANAGE MODULE REQUEST INTERCEPTORS */
+        /** MANAGE MODULE INTERCEPTORS */
         if (module && module.options?.interceptor) {
             const interceptors = Array.isArray(module.options.interceptor)
                 ? module.options.interceptor
@@ -238,6 +198,7 @@ export class FastifyEngine {
 
             for (const interceptor of interceptors) {
                 if (response) break;
+                //frequest is passed ByRef, so any change in the interceptor will be reflected here
                 const interceptorResponse = await interceptor(frequest, service);
                 if (interceptorResponse === true) continue;
                 if (interceptorResponse === false) {
@@ -248,13 +209,14 @@ export class FastifyEngine {
             }
         }
 
-        /** MANAGE SERVICE REQUEST INTERCEPTORS */
+        /** MANAGE SERVICE INTERCEPTORS */
         if (service.manager.interceptor) {
             const interceptors = Array.isArray(service.manager.interceptor)
                 ? service.manager.interceptor
                 : [service.manager.interceptor];
             for (const interceptor of interceptors) {
                 if (response) break;
+                //frequest is passed ByRef, so any change in the interceptor will be reflected here
                 const interceptorResponse = await interceptor(frequest, service);
                 if (interceptorResponse === true) continue;
                 if (interceptorResponse === false) {
