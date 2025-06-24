@@ -1,13 +1,16 @@
-import { CoreRequest, CoreService, UnauthorizedResponseError } from '@core';
+import { CoreRequest, CoreService } from '@core';
 
-export function globalRequestManager(
-    request: CoreRequest
-): Record<string, any> | Promise<Record<string, any>> | boolean | Promise<boolean> | void {
-    if (!request.session.viewCount || request.session.viewCount < 3) return true;
-    if (request.session.viewCount >= 3 && request.session.viewCount < 5) {
-        request.session.viewCount++;
-        return { cached: true, viewCount: request.session.viewCount };
-    }
-    console.log('break here');
-    throw UnauthorizedResponseError(`Limit exceeded: ${request.session.viewCount}`);
+export function globalRequestManager(request: CoreRequest, service: CoreService) {
+    console.log('globalRequestManager', service.manager.moduleName, service.manager.serviceName, service.manager.name);
+    request.params = { ...request.params, globallyManaged: true };
+}
+
+export function moduleRequestManager(request: CoreRequest, service: CoreService) {
+    console.log('moduleRequestManager', service.manager.moduleName, service.manager.serviceName, service.manager.name);
+    request.params = { ...request.params, moduleManaged: true };
+}
+
+export function serviceRequestManager(request: CoreRequest, service: CoreService) {
+    console.log('serviceRequestManager', service.manager.moduleName, service.manager.serviceName, service.manager.name);
+    request.params = { ...request.params, serviceManaged: true };
 }

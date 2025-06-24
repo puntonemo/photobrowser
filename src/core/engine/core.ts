@@ -21,7 +21,8 @@ export interface ServiceManagerOptions {
     requestCert?: boolean; // Request to renegotiate for a Client Certificate
     server?: string; // Internal use to set the remote server where de service is allocated
     // renderer?: (response: GenericObject, lang: string | string[] | undefined) => string | undefined;
-    // requestManager?: RequestManager | RequestManager[];
+    requestManager?: CoreRequestManager | CoreRequestManager[];
+    interceptor?: CoreRequestInterceptor | CoreRequestInterceptor[];
     // responseManager?: ResponseManager | ResponseManager[];
     // proxy?: ServiceProxyOptions; // Proxy Options. 'target' is required
     proxyContext?: string; // Proxy Context. default is the same service path
@@ -68,7 +69,10 @@ export class CoreService {
 }
 interface CoreModuleOptions {
     init: () => Promise<void>;
-    globalRequestManagers?: CoreRequestManager | CoreRequestManager[] //| Record<string, CoreRequestManager>
+    globalRequestManager?: CoreRequestManager | CoreRequestManager[]; //| Record<string, CoreRequestManager>
+    globalInterceptor?: CoreRequestInterceptor | CoreRequestInterceptor[]; //| Record<string, CoreRequestInterceptor>
+    requestManager?: CoreRequestManager | CoreRequestManager[]; //| Record<string, CoreRequestManager>
+    interceptor?: CoreRequestInterceptor | CoreRequestInterceptor[]; //| Record<string, CoreRequestInterceptor>
 }
 export class CoreModule {
     constructor(
@@ -90,4 +94,11 @@ export abstract class CoreRequest {
     public abstract redirect(url: string, status?: number);
     public abstract sendFile(absolutePath: string, mimeType: string);
 }
-export type CoreRequestManager = (request: CoreRequest, service?: CoreService) => Record<string, any> | Promise<Record<string, any>> | boolean | Promise<boolean> | void;
+export type CoreRequestManager = (
+    request: CoreRequest,
+    service: CoreService,
+) => CoreRequest | Promise<CoreRequest> | void;
+export type CoreRequestInterceptor = (
+    request: CoreRequest,
+    service: CoreService,
+) => Record<string, any> | Promise<Record<string, any>> | boolean | Promise<boolean> | void;

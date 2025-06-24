@@ -9,6 +9,7 @@ export const test = new CoreService(
         },
     },
     async (request) => {
+        console.log('/api/test', request.params);
         // Accede a la sesión (asegúrate de que el plugin está registrado)
         const session = request.session as any;
 
