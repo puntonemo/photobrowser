@@ -13,23 +13,19 @@ export interface ServiceManagerOptions {
     delete?: string; // Route to DELETE method
     all?: string; // Route to ALL methods
     use?: string; // Route to USE method
-    // serviceType?: ManagerType; // Service Type
     public?: boolean; // Only 'public' services are exposed in the client API
     parameters?: string;
     paramsSchema?: any; // Schema Validator for Service input parameters
     // paramsSchemaValidator?: ISchemaValidator; // Schema Validator function for Service input parameters
     requestCert?: boolean; // Request to renegotiate for a Client Certificate
     server?: string; // Internal use to set the remote server where de service is allocated
-    // renderer?: (response: GenericObject, lang: string | string[] | undefined) => string | undefined;
     interceptor?: CoreRequestInterceptor | CoreRequestInterceptor[];
-    // responseManager?: ResponseManager | ResponseManager[];
+    transformer?: CoreResponseTransformer | CoreResponseTransformer[];
     // proxy?: ServiceProxyOptions; // Proxy Options. 'target' is required
     proxyContext?: string; // Proxy Context. default is the same service path
     excludeFromReplicas?: boolean; // Exclude this service from remote replicas
-    // serviceState?: ServiceState; // Stateless / Statefull
-    // policy?: PolicyChecker | PolicyChecker[]; // Service Policy Checker
+
     meta?: Record<string, any>; // Aditional service metadata
-    // cacheConfig?: CacheConfig;
     serviceName?: string;
     moduleName?: string;
 }
@@ -67,10 +63,12 @@ export class CoreService {
     }
 }
 interface CoreModuleOptions {
-    services?: Record<string, CoreService>,
-    init?: () => Promise<void>;
+    services?: Record<string, CoreService>;
+    init?: (engine: CoreEngine) => Promise<void>;
     globalInterceptor?: CoreRequestInterceptor | CoreRequestInterceptor[]; //| Record<string, CoreRequestInterceptor>
     interceptor?: CoreRequestInterceptor | CoreRequestInterceptor[]; //| Record<string, CoreRequestInterceptor>
+    globalTransformer?: CoreResponseTransformer | CoreResponseTransformer[];
+    transformer?: CoreResponseTransformer | CoreResponseTransformer[];
 }
 export class CoreModule {
     constructor(
@@ -83,6 +81,7 @@ export abstract class CoreRequest {
     public remoteAddress: string | string[] | undefined;
     public origin: 'http' | 'ws';
     public headers: IncomingHttpHeaders;
+    public auth: any;
     constructor() {
         // console.log(req.body);
         this.params = {};
@@ -90,9 +89,26 @@ export abstract class CoreRequest {
     public abstract get session();
     public abstract redirect(url: string, status?: number);
     public abstract sendFile(absolutePath: string, mimeType: string);
+    public abstract setContentType(mimeType: string);
+    public abstract setHeader(header: string, value: string);
+    public abstract setCode(statusCode: number);
+}
+
+export abstract class CoreEngine {
+    public abstract registerInterceptor(requestInterceptor: CoreRequestInterceptor | CoreRequestInterceptor[]);
+    public abstract registerTransformer(requestTransformer: CoreResponseTransformer | CoreResponseTransformer[]);
+    public abstract registerModule(module: CoreModule);
+    public abstract registerReactApp(appPath: string);
+    public abstract staticApp(folder: string, route: string);
 }
 
 export type CoreRequestInterceptor = (
     request: CoreRequest,
     service: CoreService,
 ) => Record<string, any> | Promise<Record<string, any>> | boolean | Promise<boolean> | void;
+
+export type CoreResponseTransformer = (
+    response: Record<string, any>,
+    request: CoreRequest,
+    service: CoreService,
+) => any | Promise<any>;

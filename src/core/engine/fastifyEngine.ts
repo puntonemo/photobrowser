@@ -1,5 +1,12 @@
 import Fastify, { FastifyRegister } from 'fastify';
-import { CoreModule, CoreRequest, CoreRequestInterceptor, CoreService } from './core';
+import {
+    CoreEngine,
+    CoreModule,
+    CoreRequest,
+    CoreRequestInterceptor,
+    CoreResponseTransformer,
+    CoreService,
+} from './core';
 import { FastifySessionObject } from '@fastify/session';
 import { FastifyInstance, FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify';
 import fastifyStatic from '@fastify/static';
@@ -66,18 +73,30 @@ export class CoreFastifyRequest extends CoreRequest {
 
         return this.res.send(stream);
     }
+    public setContentType(mimeType: string) {
+        this.res.header('Content-Type', mimeType);
+    }
+    public setHeader(header: string, value: string) {
+        this.res.header(header, value);
+    }
+    public setCode(statusCode: number) {
+        this.res.code(statusCode);
+    }
 }
 
-export class FastifyEngine {
+export class FastifyEngine extends CoreEngine {
     private _serviceDict: Record<string, CoreService> = {};
     private _moduleDict: Record<string, CoreModule> = {};
     private interceptors: CoreRequestInterceptor[];
+    private transformers: CoreResponseTransformer[];
 
     public register: FastifyRegister = () => {};
     constructor(private fastify?: FastifyInstance) {
+        super();
         this.fastify = fastify || Fastify();
         this.register = this.fastify.register;
         this.interceptors = [];
+        this.transformers = [];
     }
 
     private registerService(module: CoreModule, name: string, coreService: CoreService) {
@@ -111,30 +130,29 @@ export class FastifyEngine {
             if (service[1].constructor.name === CoreService.name) this.registerService(module, service[0], service[1]);
         }
     }
-    async registerInterceptor(requestInterceptor: CoreRequestInterceptor) {
-        this.interceptors.push(requestInterceptor);
+    public async registerInterceptor(requestInterceptor: CoreRequestInterceptor | CoreRequestInterceptor[]) {
+        const interceptors = Array.isArray(requestInterceptor) ? requestInterceptor : [requestInterceptor];
+        for (const interceptor of interceptors) this.interceptors.push(interceptor);
     }
-    async registerModule(module: CoreModule) {
+    public async registerTransformer(requestTransformer: CoreResponseTransformer | CoreResponseTransformer[]) {
+        const transformers = Array.isArray(requestTransformer) ? requestTransformer : [requestTransformer];
+        for (const transformer of transformers) {
+            this.transformers.push(transformer);
+        }
+    }
+    public async registerModule(module: CoreModule) {
         this._moduleDict[module.name] = module;
-        if (module.options?.services) {
-            this.registerServices(module, module.options.services);
-        }
-        
-        if (module.options?.init) {
-            await module.options.init();
-        }
+        if (module.options?.services) this.registerServices(module, module.options.services);
 
-        /** MANAGE GLOBAL REQUEST INTERCEPTORS */
-        if (module.options?.globalInterceptor) {
-            const globalInterceptors = Array.isArray(module.options.globalInterceptor)
-                ? module.options.globalInterceptor
-                : [module.options.globalInterceptor];
-            for (const globalInterceptor of globalInterceptors) {
-                this.registerInterceptor(globalInterceptor);
-            }
-        }
+        if (module.options?.init) await module.options.init(this);
+
+        /** MANAGE GLOBAL INTERCEPTORS */
+        if (module.options?.globalInterceptor) this.registerInterceptor(module.options.globalInterceptor);
+
+        /** MANAGE GLOBAL TRANSFORMERS */
+        if (module.options?.globalTransformer) this.registerTransformer(module.options?.globalTransformer);
     }
-    async registerReactApp(appPath = '/app') {
+    public async registerReactApp(appPath = '/app') {
         if (!this.fastify) return;
 
         await this.fastify.register(reactApp, { prefix: appPath });
@@ -146,7 +164,7 @@ export class FastifyEngine {
         });
         console.log(`✅ Frontend serving at ${appPath}/`);
     }
-    async staticApp(folder: string, route: string) {
+    public async staticApp(folder: string, route: string) {
         if (!this.fastify) return;
         console.log('🔄 Iniciando staticApp', path.join(__dirname), folder, route);
         this.fastify.register(fastifyStatic, {
@@ -158,11 +176,11 @@ export class FastifyEngine {
             reply.redirect(`${route}/`);
         });
     }
-    async start() {
+    public async start() {
         if (!this.fastify) return;
         try {
             const PORT = +(process.env.PORT ?? 3000);
-            const HOST = process.env.HOST ?? '0.0.0.0'
+            const HOST = process.env.HOST ?? '0.0.0.0';
             await this.fastify.listen({ port: PORT, host: HOST });
             console.log(`Servidor escuchando en ${HOST}:${PORT}`);
         } catch (err) {
@@ -235,6 +253,31 @@ export class FastifyEngine {
             response = await service.manager(frequest).catch((error) => {
                 return error;
             });
+
+        /** MANAGE GLOBAL TRANSFORMERS */
+        for (const transformer of this.transformers) {
+            response = (await transformer(response!, frequest, service)) ?? response;
+        }
+
+        /** MANAGE MODULE INTERCEPTORS */
+        if (module && module.options?.transformer) {
+            const transformers = Array.isArray(module.options.transformer)
+                ? module.options.transformer
+                : [module.options.transformer];
+            for (const transformer of transformers) {
+                response = (await transformer(response!, frequest, service)) ?? response;
+            }
+        }
+
+        /** MANAGE SERVICE INTERCEPTORS */
+        if (service.manager?.transformer) {
+            const transformers = Array.isArray(service.manager.transformer)
+                ? service.manager.transformer
+                : [service.manager.transformer];
+            for (const transformer of transformers) {
+                response = (await transformer(response!, frequest, service)) ?? response;
+            }
+        }
 
         if (response && response['result'] && response['result'] == 'error') {
             rep.code(response['status'] || 500).send(response);
