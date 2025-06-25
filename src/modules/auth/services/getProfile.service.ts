@@ -1,14 +1,12 @@
 import { CoreService, UnauthorizedResponseError } from '@core';
-import { serviceRequestInterceptor } from '../requestManagers';
 
 export const getProfile = new CoreService(
     {
-        get: '/api/auth/profile',
-        interceptor: serviceRequestInterceptor
+        get: '/api/auth/profile'
     },
     async (request) => {
-        if (request.session.auth !== undefined) {
-            return request.session.auth;
+        if (request.auth !== undefined) {
+            return request.auth;
         } else throw UnauthorizedResponseError();
     },
 );

@@ -59,7 +59,6 @@ const AppDataSourceInitOptions = {
 // await fastifyEngine.compileReactApp();
 AppDataSourceInit(AppDataSourceInitOptions).then(async () => {
     const fastifyEngine = new FastifyEngine();
-
     fastifyEngine.register(cookie);
     fastifyEngine.register(session, {
         secret: 'a-very-secret-key-that-should-be-long',
@@ -72,5 +71,12 @@ AppDataSourceInit(AppDataSourceInitOptions).then(async () => {
     await fastifyEngine.registerModule(testModule);
     await fastifyEngine.registerModule(authModule);
     await fastifyEngine.registerModule(pbModule);
+    
+    console.log(`
+ ___ _        _       ___                            
+| _ \\ |_  ___| |_ ___| _ )_ _ _____ __ _____ ___ _ _ 
+|  _/ ' \\/ _ \\  _/ _ \\ _ \\ '_/ _ \\ V  V (_-</ -_) '_|
+|_| |_||_\\___/\\__\\___/___/_| \\___/\\_/\\_/\\__/\\___|_|        v.1.0
+`);
     void fastifyEngine.start();
 });

@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { UsersMediaAlbums } from 'model/UsersMediaAlbums';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn } from 'typeorm';
 
 @Entity('media_albums')
 export class MediaAlbum {
@@ -23,4 +24,8 @@ export class MediaAlbum {
 
     @Column('bigint', { name: 'created_by' })
     createdBy!: string;
+
+    @OneToMany(() => UsersMediaAlbums, (usersMediaAlbums) => usersMediaAlbums.mediaAlbum)
+    @JoinColumn({ name: 'id', referencedColumnName: 'media_album_id' })
+    mediaAlbums: UsersMediaAlbums[];
 }

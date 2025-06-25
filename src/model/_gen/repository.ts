@@ -26,7 +26,7 @@ export class GenericFindDto {
 }
 
 export type GenericRepositoryOptions = {
-    relations?: string[];
+    relations?: Array<string | Record<string, any>>;
     filters?: string[];
     defaultPageSize?: number;
 };
@@ -34,7 +34,7 @@ export type GenericRepositoryOptions = {
 export class GenericRepository<ENTITY extends ObjectLiteral, FindDTO extends FindOptionsWhere<ENTITY>> {
     public readonly repository: Repository<ENTITY>;
     public readonly entityName: string;
-    public readonly relations: string[];
+    public readonly relations: Array<string | Record<string, any>>;
     public readonly filters: string[];
     public readonly defaultPageSize: number;
 
@@ -72,10 +72,16 @@ export class GenericRepository<ENTITY extends ObjectLiteral, FindDTO extends Fin
 
         const findOptions: any = { take: pageSize, skip, where: {}, order: {}, relations: {} };
 
-        this.relations?.map((relation) => {
-            findOptions.relations[relation] =
-                filters[relation] !== false ? filters.relations === true || filters[relation] === true : false;
-        });
+        for (const relation of this.relations) {
+            if (typeof relation === 'string') {
+                findOptions.relations[relation] =
+                    filters[relation] !== false ? filters.relations === true || filters[relation] === true : false;
+            } else {
+                for (const entry of Object.entries(relation)) {
+                    findOptions.relations[entry[0]] = filters[entry[0]] && filters[entry[0]] !== false ? entry[1] : filters.relations === true ? entry[1] : false;
+                }
+            }
+        }
 
         if (filters.order) {
             findOptions.order[filters.order] = (filters.ascending ?? true) ? 'ASC' : 'DESC';

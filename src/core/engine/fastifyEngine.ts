@@ -124,6 +124,11 @@ export class FastifyEngine extends CoreEngine {
             console.log(module.name, name, 'delete', coreService.manager.delete);
             this.fastify.delete(coreService.manager.delete, async (req, rep) => this.handler(req, rep, coreService));
         }
+        if (coreService.manager.all) {
+            console.log(module.name, name, 'delete', coreService.manager.all);
+            this.fastify.all(coreService.manager.all, async (req, rep) => this.handler(req, rep, coreService));
+        }
+        
     }
     private registerServices(module: CoreModule, services: Record<string, CoreService>) {
         for (const service of Object.entries(services)) {
@@ -201,7 +206,7 @@ export class FastifyEngine extends CoreEngine {
         for (const interceptor of this.interceptors) {
             if (response) break;
             //frequest is passed ByRef, so any change in the interceptor will be reflected here
-            const interceptorResponse = await interceptor(frequest, service);
+            const interceptorResponse = await interceptor(frequest, service.manager);
 
             if (interceptorResponse === true) continue;
             if (interceptorResponse === false) {
@@ -220,7 +225,7 @@ export class FastifyEngine extends CoreEngine {
             for (const interceptor of interceptors) {
                 if (response) break;
                 //frequest is passed ByRef, so any change in the interceptor will be reflected here
-                const interceptorResponse = await interceptor(frequest, service);
+                const interceptorResponse = await interceptor(frequest, service.manager);
                 if (interceptorResponse === true) continue;
                 if (interceptorResponse === false) {
                     response = UnauthorizedResponseError();
@@ -238,7 +243,7 @@ export class FastifyEngine extends CoreEngine {
             for (const interceptor of interceptors) {
                 if (response) break;
                 //frequest is passed ByRef, so any change in the interceptor will be reflected here
-                const interceptorResponse = await interceptor(frequest, service);
+                const interceptorResponse = await interceptor(frequest, service.manager);
                 if (interceptorResponse === true) continue;
                 if (interceptorResponse === false) {
                     response = UnauthorizedResponseError();
@@ -256,7 +261,7 @@ export class FastifyEngine extends CoreEngine {
 
         /** MANAGE GLOBAL TRANSFORMERS */
         for (const transformer of this.transformers) {
-            response = (await transformer(response!, frequest, service)) ?? response;
+            response = (await transformer(response!, frequest, service.manager)) ?? response;
         }
 
         /** MANAGE MODULE INTERCEPTORS */
@@ -265,7 +270,7 @@ export class FastifyEngine extends CoreEngine {
                 ? module.options.transformer
                 : [module.options.transformer];
             for (const transformer of transformers) {
-                response = (await transformer(response!, frequest, service)) ?? response;
+                response = (await transformer(response!, frequest, service.manager)) ?? response;
             }
         }
 
@@ -275,7 +280,7 @@ export class FastifyEngine extends CoreEngine {
                 ? service.manager.transformer
                 : [service.manager.transformer];
             for (const transformer of transformers) {
-                response = (await transformer(response!, frequest, service)) ?? response;
+                response = (await transformer(response!, frequest, service.manager)) ?? response;
             }
         }
 

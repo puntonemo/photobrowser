@@ -5,3 +5,4 @@ export * from './MediaItems/entity';
 export * from './MediaItemTags/entity';
 export * from './MediaAlbums/entity';
 export * from './MediaAlbumItems/entity';
+export * from './UsersMediaAlbums/entity';

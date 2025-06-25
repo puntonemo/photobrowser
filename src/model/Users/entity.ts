@@ -1,5 +1,6 @@
+import { UsersMediaAlbums } from 'model/UsersMediaAlbums';
 import { UserCredential } from 'model/UserCredentials';
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -34,4 +35,21 @@ export class User {
     @OneToMany(() => UserCredential, (credential) => credential.user)
     @JoinColumn({ name: 'id', referencedColumnName: 'user_id' })
     credentials: UserCredential[];
+
+    // @ManyToMany(() => MediaAlbum, (mediaAlbums) => mediaAlbums)
+    // @JoinTable({
+    //     name: 'user_media_albums',
+    //     joinColumn: {
+    //         name: 'user_id',
+    //         referencedColumnName: 'id',
+    //     },
+    //     inverseJoinColumn: {
+    //         name: 'media_album_id',
+    //         referencedColumnName: 'id',
+    //     },
+    // })
+    // mediaAlbums: MediaAlbum[];
+    @OneToMany(() => UsersMediaAlbums, (usersMediaAlbums) => usersMediaAlbums.user)
+    @JoinColumn({ name: 'id', referencedColumnName: 'user_id' })
+    mediaAlbums: UsersMediaAlbums[];
 }

@@ -1,6 +1,6 @@
 import { CoreModule } from '@core';
 import * as services from './services';
-import * as globalRequestManagers from './requestManagers';
+import * as interceptors from './interceptors';
 
 async function init() {
     console.log('🔐 auth module init');
@@ -9,6 +9,5 @@ async function init() {
 export const authModule = new CoreModule('auth', {
     services,
     init,
-    globalInterceptor: globalRequestManagers.globalRequestInterceptor,
-    interceptor: globalRequestManagers.moduleRequestInterceptor,
+    globalInterceptor: interceptors.authGlobalInterceptor,
 });

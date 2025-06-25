@@ -104,11 +104,11 @@ export abstract class CoreEngine {
 
 export type CoreRequestInterceptor = (
     request: CoreRequest,
-    service: CoreService,
+    service: ServiceManager,
 ) => Record<string, any> | Promise<Record<string, any>> | boolean | Promise<boolean> | void;
 
 export type CoreResponseTransformer = (
     response: any,
     request: CoreRequest,
-    service: CoreService,
+    service: ServiceManager,
 ) => any | Promise<any>;

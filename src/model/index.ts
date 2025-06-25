@@ -50,7 +50,6 @@ export type AppDataSourceInitOptionsType = {
 };
 export function AppDataSourceInit(options: AppDataSourceInitOptionsType): Promise<DataSource> {
     const { type, hostname, port, username, password, database, dbLogging } = options;
-    console.log(options);
     return new Promise((resolve, reject) => {
         console.debug(`AppDataSourceInit: ${type}://${username}:${password}@${hostname}:${port}/${database}`);
         const AppDataSource = new DataSource({

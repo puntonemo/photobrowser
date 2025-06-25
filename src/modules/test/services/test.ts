@@ -5,11 +5,13 @@ export const test = new CoreService(
     {
         get: '/api/test',
         meta: {
+            public: true,
             limit: 5,
         },
     },
     async (request) => {
         console.log('/api/test', request.params);
+
         // Accede a la sesión (asegúrate de que el plugin está registrado)
         const session = request.session as any;
 
