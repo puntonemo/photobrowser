@@ -108,7 +108,7 @@ export type CoreRequestInterceptor = (
 ) => Record<string, any> | Promise<Record<string, any>> | boolean | Promise<boolean> | void;
 
 export type CoreResponseTransformer = (
-    response: Record<string, any>,
+    response: any,
     request: CoreRequest,
     service: CoreService,
 ) => any | Promise<any>;
