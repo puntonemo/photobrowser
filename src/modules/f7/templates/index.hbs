@@ -52,6 +52,18 @@
                 document.addEventListener("DOMContentLoaded", fn);
             }
         }
+        async function loadComponent(container, component, attributes) {
+            if (!customElements.get(component))
+                await import(`{{config.path}}/components/${component}.js`); // usa ruta relativa al host
+
+            const el = document.createElement(component);
+            for (const entry of Object.entries(attributes)) 
+                el[entry[0]] = entry[1];
+            
+            container.appendChild(el);
+            return el;
+        
+        }
         async function getProfile() {
             const res = await fetch('/api/auth/profile');
             if (res.ok) {

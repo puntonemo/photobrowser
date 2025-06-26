@@ -26,44 +26,37 @@
 </style>
 <!-- rest of component logic -->
 <script>
-    async function loadComponent(container, component, attributes) {
-        if (!customElements.get(component))
-            await import(`{{config.path}}/components/${component}.js`); // usa ruta relativa al host
-
-        const el = document.createElement(component);
-        for (const entry of Object.entries(attributes)) 
-            el.setAttribute(entry[0], entry[1]);
-        
-        container.appendChild(el);
-    
-    }
-    async function getAlbums() {
-        
-        const res = await fetch('/api/pb/albums');
-        if (res.ok) {
-            const response = await res.json();
-            const container = document.querySelector('.container');
-            container.innerHTML = ''; // Limpia antes de renderizar
-
-            for (const album of response) {
-                const attributes = {
-                    'id': album.id,
-                    'title': album.title,
-                    'description': album.description,
-                    'role': album.role,
-                    'createdAt': album.createdAt,
-                }
-                console.log(album);
-                await loadComponent(container, 'album-card', attributes);
-            }
-        } else {
-            console.log(res.statusText);
-        }
-    }
-
     // script must return/export component function
     export default (props, { $f7, $on, $f7router }) => {
         const pageTitle = "Mis álbumes"
+        
+        async function getAlbums() {
+        
+            const res = await fetch('/api/pb/albums');
+            if (res.ok) {
+                const response = await res.json();
+                const container = document.querySelector('.container');
+                container.innerHTML = ''; // Limpia antes de renderizar
+
+                for (const album of response) {
+                    const attributes = {
+                        'id': album.id,
+                        'title': album.title,
+                        'description': album.description,
+                        'role': album.role,
+                        'createdAt': album.createdAt,
+                        'openAlbum' : openAlbum,
+                    }
+                    const component = await loadComponent(container, 'album-card', attributes);
+                   
+                }
+            } else {
+                console.log(res.statusText);
+            }
+        }
+        const openAlbum = (id) => {
+            console.log('openAlbum', id);
+        }
         $on('pageInit', () => {
             getAlbums();
         });

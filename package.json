@@ -16,7 +16,8 @@
     "dev": "tsup --watch --no-clean --onSuccess 'cross-env NODE_ENV=dev node dist/index.js'",
     "staging": "tsup --watch --onSuccess 'cross-env NODE_ENV=staging node dist/index.js'",
     "build:resources": "cpx \"src/modules/auth/templates/**/*\" dist/modules/auth/templates && cpx \"src/modules/f7/templates/**/*\" dist/modules/f7/templates",
-    "resources": "npm run build:resources"
+    "resources": "npm run build:resources",
+    "res": "npm run build:resources"
   },
   "keywords": [],
   "author": "",
