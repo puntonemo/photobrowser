@@ -17,6 +17,9 @@ const Home: React.FC = () => {
                 <Trans i18nKey="userMessagesUnread" count={count}>
                     You have {{ count }} unread message.
                 </Trans>
+                <p>
+                    <a href="/api/auth/passport/authUrl/google">Iniciar sesión con google</a>
+                </p>
             </>
         );
     return (

@@ -6,6 +6,9 @@ import { Repositories } from 'model';
 export const generateOptions = new CoreService(
     {
         post: '/api/auth/generate-options',
+        meta: {
+            public: true,
+        },
     },
     async (request) => {
         const { username } = request.params;

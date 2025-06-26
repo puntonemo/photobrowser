@@ -5,6 +5,9 @@ import { Repositories } from 'model';
 export const digestProviderResponse = new CoreService(
     {
         get: '/api/auth/passport/response/:provider',
+        meta: {
+            public: true,
+        },
     },
     async (request: CoreRequest) => {
         const providerResponse = await logic.digestProviderResponse(request.params).catch((error) => {

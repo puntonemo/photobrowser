@@ -10,6 +10,9 @@ const toBase64Url = (input: Buffer | string): string =>
 export const verifyRegistration = new CoreService(
     {
         post: '/api/auth/register/verify',
+        meta: {
+            public: true,
+        },
     },
     async (request) => {
         function extractChallenge(clientDataJSONBase64: string): string {

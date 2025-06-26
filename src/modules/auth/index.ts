@@ -6,7 +6,7 @@ async function init() {
     console.log('🔐 auth module init');
 }
 
-export const authModule = new CoreModule('auth', {
+export default new CoreModule('auth', {
     services,
     init,
     globalInterceptor: interceptors.authGlobalInterceptor,

@@ -7,6 +7,9 @@ import { sendPinCode } from '../helpers';
 export const signin = new CoreService(
     {
         post: '/api/auth/signin',
+        meta: {
+            public: true,
+        },
     },
     async (request) => {
         const { email, challenge, pinCode, language } = request.params;

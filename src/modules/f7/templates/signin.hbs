@@ -1,0 +1,45 @@
+<!-- component template, uses same tagged template literals -->
+<template>
+    <div class="page">
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+                <div class="left">
+                    <a class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Atrás</span>
+                    </a>
+                </div>
+                <div class="title">${pageTitle}</div>
+            </div>
+        </div>
+        <div class="block margin-top">
+            <p>Inicia sesión</p>
+            <div class="grid grid-cols-1 medium-grid-cols-3 grid-gap">
+
+                    <div><a href="/api/auth/passport/authUrl/google" class="button button-fill">Google</a></div>
+                    <div><a href="https://www.google.es">Google</a></div>
+            </div>
+        </div>
+    </div>
+</template>
+<!-- component styles -->
+<style>
+
+</style>
+<!-- rest of component logic -->
+<script>
+    // script must return/export component function
+    export default (props, { $f7, $on, $f7router }) => {
+        const pageTitle = "Inicio de sesión"
+        $on('pageInit', () => {
+            // do something on page init
+        });
+        $on('pageAfterOut', () => {
+            // page has left the view
+        });
+
+        // component function must return render function
+        return $render;
+    }
+</script>

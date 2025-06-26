@@ -15,7 +15,7 @@
     "git:clean": "git fetch --prune && git branch | xargs git branch -d",
     "dev": "tsup --watch --no-clean --onSuccess 'cross-env NODE_ENV=dev node dist/index.js'",
     "staging": "tsup --watch --onSuccess 'cross-env NODE_ENV=staging node dist/index.js'",
-    "build:resources": "cpx \"src/modules/auth/templates/**/*\" dist/modules/auth/templates",
+    "build:resources": "cpx \"src/modules/auth/templates/**/*\" dist/modules/auth/templates && cpx \"src/modules/f7/templates/**/*\" dist/modules/f7/templates",
     "resources": "npm run build:resources"
   },
   "keywords": [],
@@ -32,6 +32,7 @@
     "chokidar": "^4.0.3",
     "cpx": "^1.5.0",
     "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
     "fastify": "^5.2.2",
     "handlebars": "^4.7.8",
     "i18next": "^25.0.1",
@@ -64,5 +65,5 @@
     "tsx": "^4.19.3",
     "typescript": "^5.8.2"
   },
-  "packageManager": "pnpm@10.11.1+sha512.e519b9f7639869dc8d5c3c5dfef73b3f091094b0a006d7317353c72b124e80e1afd429732e28705ad6bfa1ee879c1fce46c128ccebd3192101f43dd67c667912"
+  "packageManager": "pnpm@10.12.3+sha512.467df2c586056165580ad6dfb54ceaad94c5a30f80893ebdec5a44c5aa73c205ae4a5bb9d5ed6bb84ea7c249ece786642bbb49d06a307df218d03da41c317417"
 }

@@ -4,6 +4,9 @@ import * as logic from '../../controllers/passport/getProviderAuthUrl.controller
 export const getProviderAuthUrl = new CoreService(
     {
         get: '/api/auth/passport/authUrl/:provider',
+        meta: {
+            public: true,
+        },
     },
     async (request: CoreRequest) => {
         const { provider, redirect_uri, state, scopes } = request.params;

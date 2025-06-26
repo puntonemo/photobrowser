@@ -13,6 +13,9 @@ const fromBase64Url = (input: string) => Buffer.from(input, 'base64url').toStrin
 export const verifyAuthentication = new CoreService(
     {
         post: '/api/auth/verify',
+        meta: {
+            public: true,
+        },
     },
     async (request) => {
         const response = request.params as AuthenticationResponseJSON;

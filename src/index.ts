@@ -1,15 +1,17 @@
+import { FastifyEngine } from '@core';
+import { AppDataSourceInit } from './model';
+import { fileURLToPath } from 'url';
 import 'reflect-metadata';
 import cookie from '@fastify/cookie';
 import session from '@fastify/session';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import { FastifyEngine } from '@core';
-import { testModule } from '@modules/test';
-import { authModule } from '@modules/auth';
-import { pbModule } from '@modules/pb';
-import { AppDataSourceInit } from './model';
+/* APP MODULES */
+import testModule from '@modules/test';
+import authModule from '@modules/auth';
+import pbModule from '@modules/pb';
+import f7Module from '@modules/f7';
 
 // __dirname en ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -71,12 +73,13 @@ AppDataSourceInit(AppDataSourceInitOptions).then(async () => {
     await fastifyEngine.registerModule(testModule);
     await fastifyEngine.registerModule(authModule);
     await fastifyEngine.registerModule(pbModule);
-    
+    await fastifyEngine.registerModule(f7Module);
+
     console.log(`
  ___ _        _       ___                            
 | _ \\ |_  ___| |_ ___| _ )_ _ _____ __ _____ ___ _ _ 
 |  _/ ' \\/ _ \\  _/ _ \\ _ \\ '_/ _ \\ V  V (_-</ -_) '_|
-|_| |_||_\\___/\\__\\___/___/_| \\___/\\_/\\_/\\__/\\___|_|        v.1.0
+|_| |_||_\\___/\\__\\___/___/_| \\___/\\_/\\_/\\__/\\___|_|     v.1.0
 `);
     void fastifyEngine.start();
 });
