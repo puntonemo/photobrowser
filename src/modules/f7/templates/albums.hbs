@@ -1,0 +1,109 @@
+<!-- component template, uses same tagged template literals -->
+<template>
+    <div class="page">
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+                <div class="left">
+                    <a class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">${pageTitle}</div>
+            </div>
+        </div>
+        <div class="page-content">
+            <div class="block margin-top container">
+
+            </div>
+        </div>
+    </div>
+        
+</template>
+<!-- component styles -->
+<style>
+
+</style>
+<!-- rest of component logic -->
+<script>
+    class AlbumCard extends HTMLElement {
+        constructor() {
+            super();
+            this.attachShadow({ mode: 'open' });
+        }
+
+        connectedCallback() {
+            if (this.shadowRoot && this.shadowRoot.children.length > 0) return;
+            const template = document.getElementById('album-card-template');
+            const clone = template.content.cloneNode(true);
+            console.log(clone);
+
+            const title = this.getAttribute('title') || '';
+            const description = this.getAttribute('description') || '';
+            const role = this.getAttribute('role') || '';
+            const createdAt = this.getAttribute('created-at') || '';
+
+            clone.querySelector('.title').textContent = title;
+            clone.querySelector('.description').textContent = description ;
+            clone.querySelector('.meta').textContent = `${role} · ${new Date(createdAt).toLocaleString()}`;
+
+            const shadow = this.shadowRoot || this.attachShadow({ mode: 'open' });
+            shadow.appendChild(clone);
+            
+        }
+    }
+
+    customElements.define('album-card', AlbumCard);
+
+    async function loadAlbumCardTemplate() {
+        if (document.getElementById('album-card-template')) {
+            console.log('Ya está cargado');
+            return;
+        }else{
+            console.log('Cargando...');
+        }
+        const res = await fetch('{{config.path}}/components/album-card');
+        const html = await res.text();
+        const container = document.createElement('div');
+        container.innerHTML = html;
+        document.body.appendChild(container.firstElementChild); // Inserta solo el template
+        console.log('Cargado!');
+    }
+
+    async function getAlbums() {
+        await loadAlbumCardTemplate();
+        const res = await fetch('/api/pb/albums');
+        if (res.ok) {
+            const response = await res.json();
+            console.log(response);
+            const container = document.querySelector('.container');
+            container.innerHTML = ''; // Limpia antes de renderizar
+
+            for (const album of response) {
+                console.log(album);
+                const el = document.createElement('album-card');
+                el.setAttribute('title', album.title);
+                el.setAttribute('description', album.description);
+                el.setAttribute('role', album.role);
+                el.setAttribute('created-at', album.createdAt);
+                container.appendChild(el);
+            }
+        } else {
+            console.log(res.statusText);
+        }
+    }
+    // script must return/export component function
+    export default (props, { $f7, $on, $f7router }) => {
+        const pageTitle = "Mis álbumes"
+        $on('pageInit', () => {
+            getAlbums();
+        });
+        $on('pageAfterOut', () => {
+            // page has left the view
+        });
+
+        // component function must return render function
+        return $render;
+    }
+</script>

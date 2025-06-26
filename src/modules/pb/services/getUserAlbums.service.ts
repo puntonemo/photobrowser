@@ -1,5 +1,5 @@
 import { CoreService } from '@core';
-import * as controllers from '../controllers';
+import getUserAlbumsController from './getUserAlbums.controller';
 
 export const getUserAlbums = new CoreService(
     {
@@ -9,6 +9,6 @@ export const getUserAlbums = new CoreService(
         },
     },
     async () => {
-        return controllers.getUserAlbums();
+        return getUserAlbumsController();
     },
 );

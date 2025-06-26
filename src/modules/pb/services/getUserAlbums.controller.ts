@@ -1,7 +1,7 @@
 import { NotFoundResponseError } from '@core';
 import { Repositories } from 'model';
 
-export async function getUserAlbums() {
+export default async () => {
     const user = await Repositories.Users.getOne({ id: '1', mediaAlbums: true });
 
     if (!user) throw NotFoundResponseError();
