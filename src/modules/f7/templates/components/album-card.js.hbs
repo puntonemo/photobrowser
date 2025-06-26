@@ -1,0 +1,58 @@
+import { LitElement, html, css } from 'https://unpkg.com/lit@latest?module';
+
+export class AlbumCard extends LitElement {
+  static properties = {
+    id: { type: String },
+    title: { type: String },
+    description: { type: String },
+    role: { type: String },
+    createdAt: { type: String },
+  };
+
+  static styles = css`
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-family: sans-serif;
+      background-color: white;
+      color: black;
+    }
+    .title {
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+    .demo-card-header-pic .card-header {
+      height: 40vw;
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+    }
+    .md .demo-card-header-pic .card-header {
+      margin: 0 16px 16px;
+      border-radius: 16px;
+      position: relative;
+      top: 16px;
+    }
+    .demo-card-header-pic .card-content-padding .date {
+      color: #8e8e93;
+    }
+  `;
+
+  render() {
+    return html`
+      <div class="card demo-card-header-pic">
+        <a class="title" href="/api/${this.id}">${this.title}</a>
+        <div style="background-image:url(https://cdn.framework7.io/placeholder/people-1000x600-${this.id}.jpg)" valign="bottom" class="card-header">${this.title}</div>
+        <div class="card-content card-content-padding">
+          <p class="date">${this.role} · ${new Date(this.createdAt).toLocaleString()}</p>
+          <p>${this.description}</p>
+        </div>
+        <div class="card-footer"><a class="link">Like</a><a class="link">Read more</a></div>
+      </div>
+    `;
+  }
+}
+
+customElements.define('album-card', AlbumCard);

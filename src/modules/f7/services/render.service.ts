@@ -34,7 +34,11 @@ async function transformer(response: any, request: CoreRequest, service: Service
         meta: { ...service.meta },
     };
 
-    request.setContentType('text/html');
+    if (templateName.endsWith('.js')) {
+        request.setContentType('application/javascript');
+    } else {
+        request.setContentType('text/html');
+    }
     return template(data);
 }
 export const home = new CoreService(

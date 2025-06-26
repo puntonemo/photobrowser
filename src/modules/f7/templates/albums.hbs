@@ -1,4 +1,3 @@
-<!-- component template, uses same tagged template literals -->
 <template>
     <div class="page">
         <div class="navbar">
@@ -27,53 +26,19 @@
 </style>
 <!-- rest of component logic -->
 <script>
-    class AlbumCard extends HTMLElement {
-        constructor() {
-            super();
-            this.attachShadow({ mode: 'open' });
-        }
-        async loadComponentTemplate(component, templateId) {
-            if (document.getElementById(templateId)) return;
-        
-            const res = await fetch(`{{config.path}}/components/${component}`);
-            const html = await res.text();
-            const container = document.createElement('div');
-            container.innerHTML = html;
-            document.body.appendChild(container.firstElementChild); // Inserta solo el template
-        }
-        connectedCallback() {
-            if (this.shadowRoot && this.shadowRoot.children.length > 0) return;
-
-            this.loadComponentTemplate('album-card', 'album-card-template').then(() => {
-                const template = document.getElementById('album-card-template');
-                const clone = template.content.cloneNode(true);
-
-                const title = this.getAttribute('title') || '';
-                const description = this.getAttribute('description') || '';
-                const role = this.getAttribute('role') || '';
-                const createdAt = this.getAttribute('created-at') || '';
-
-                clone.querySelector('.title').textContent = title;
-                clone.querySelector('.description').textContent = description ;
-                clone.querySelector('.meta').textContent = `${role} · ${new Date(createdAt).toLocaleString()}`;
-
-                const shadow = this.shadowRoot || this.attachShadow({ mode: 'open' });
-                shadow.appendChild(clone);
-            });
-        }
-    }
-
-    function loadComponent(container, component, attributes) {
-        
+    async function loadComponent(container, component, attributes) {
+        if (!customElements.get(component))
+            await import(`{{config.path}}/components/${component}.js`); // usa ruta relativa al host
 
         const el = document.createElement(component);
         for (const entry of Object.entries(attributes)) 
             el.setAttribute(entry[0], entry[1]);
         
         container.appendChild(el);
-    }
     
+    }
     async function getAlbums() {
+        
         const res = await fetch('/api/pb/albums');
         if (res.ok) {
             const response = await res.json();
@@ -86,17 +51,15 @@
                     'title': album.title,
                     'description': album.description,
                     'role': album.role,
-                    'created-at': album.createdAt,
+                    'createdAt': album.createdAt,
                 }
                 console.log(album);
-                loadComponent(container, 'album-card', attributes);
+                await loadComponent(container, 'album-card', attributes);
             }
         } else {
             console.log(res.statusText);
         }
     }
-    // Components definition
-    customElements.define('album-card', AlbumCard);
 
     // script must return/export component function
     export default (props, { $f7, $on, $f7router }) => {
