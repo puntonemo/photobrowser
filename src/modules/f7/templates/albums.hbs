@@ -32,67 +32,72 @@
             super();
             this.attachShadow({ mode: 'open' });
         }
-
+        async loadComponentTemplate(component, templateId) {
+            if (document.getElementById(templateId)) return;
+        
+            const res = await fetch(`{{config.path}}/components/${component}`);
+            const html = await res.text();
+            const container = document.createElement('div');
+            container.innerHTML = html;
+            document.body.appendChild(container.firstElementChild); // Inserta solo el template
+        }
         connectedCallback() {
             if (this.shadowRoot && this.shadowRoot.children.length > 0) return;
-            const template = document.getElementById('album-card-template');
-            const clone = template.content.cloneNode(true);
-            console.log(clone);
 
-            const title = this.getAttribute('title') || '';
-            const description = this.getAttribute('description') || '';
-            const role = this.getAttribute('role') || '';
-            const createdAt = this.getAttribute('created-at') || '';
+            this.loadComponentTemplate('album-card', 'album-card-template').then(() => {
+                const template = document.getElementById('album-card-template');
+                const clone = template.content.cloneNode(true);
 
-            clone.querySelector('.title').textContent = title;
-            clone.querySelector('.description').textContent = description ;
-            clone.querySelector('.meta').textContent = `${role} · ${new Date(createdAt).toLocaleString()}`;
+                const title = this.getAttribute('title') || '';
+                const description = this.getAttribute('description') || '';
+                const role = this.getAttribute('role') || '';
+                const createdAt = this.getAttribute('created-at') || '';
 
-            const shadow = this.shadowRoot || this.attachShadow({ mode: 'open' });
-            shadow.appendChild(clone);
-            
+                clone.querySelector('.title').textContent = title;
+                clone.querySelector('.description').textContent = description ;
+                clone.querySelector('.meta').textContent = `${role} · ${new Date(createdAt).toLocaleString()}`;
+
+                const shadow = this.shadowRoot || this.attachShadow({ mode: 'open' });
+                shadow.appendChild(clone);
+            });
         }
     }
 
-    customElements.define('album-card', AlbumCard);
+    function loadComponent(container, component, attributes) {
+        
 
-    async function loadAlbumCardTemplate() {
-        if (document.getElementById('album-card-template')) {
-            console.log('Ya está cargado');
-            return;
-        }else{
-            console.log('Cargando...');
-        }
-        const res = await fetch('{{config.path}}/components/album-card');
-        const html = await res.text();
-        const container = document.createElement('div');
-        container.innerHTML = html;
-        document.body.appendChild(container.firstElementChild); // Inserta solo el template
-        console.log('Cargado!');
+        const el = document.createElement(component);
+        for (const entry of Object.entries(attributes)) 
+            el.setAttribute(entry[0], entry[1]);
+        
+        container.appendChild(el);
     }
-
+    
     async function getAlbums() {
-        await loadAlbumCardTemplate();
         const res = await fetch('/api/pb/albums');
         if (res.ok) {
             const response = await res.json();
-            console.log(response);
             const container = document.querySelector('.container');
             container.innerHTML = ''; // Limpia antes de renderizar
 
             for (const album of response) {
+                const attributes = {
+                    'id': album.id,
+                    'title': album.title,
+                    'description': album.description,
+                    'role': album.role,
+                    'created-at': album.createdAt,
+                }
                 console.log(album);
-                const el = document.createElement('album-card');
-                el.setAttribute('title', album.title);
-                el.setAttribute('description', album.description);
-                el.setAttribute('role', album.role);
-                el.setAttribute('created-at', album.createdAt);
-                container.appendChild(el);
+                loadComponent(container, 'album-card', attributes);
             }
         } else {
             console.log(res.statusText);
         }
     }
+    // Components definition
+    customElements.define('album-card', AlbumCard);
+
     // script must return/export component function
     export default (props, { $f7, $on, $f7router }) => {
         const pageTitle = "Mis álbumes"
