@@ -35,11 +35,9 @@ export class AlbumCard extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     const requiredProps = ['id'];
-    for (const prop of requiredProps) {
-      if (this[prop] === undefined || this[prop] === null) {
+    for (const prop of requiredProps) 
+      if (this[prop] === undefined || this[prop] === null) 
         throw new Error(`<album-card> requiere la propiedad "${prop}"`);
-      }
-    }
   }
   createRenderRoot() {
     return this; // ✅ renderiza en Light DOM (hereda estilos externos)

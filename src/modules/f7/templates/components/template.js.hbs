@@ -1,0 +1,28 @@
+import { LitElement, html, css } from 'https://unpkg.com/lit@latest?module';
+
+class myComponent extends LitElement {
+    static properties = {
+        name: { type: String },
+        picture: { type: String },
+    };
+    static styles = css`
+    `;
+
+    connectedCallback() {
+        super.connectedCallback();
+        const requiredProps = ['name', 'picture'];
+
+        for (const prop of requiredProps) 
+            if (this[prop] === undefined || this[prop] === null) 
+                throw new Error(`<album-card> requiere la propiedad "${prop}"`);
+    }
+    createRenderRoot() {
+        return this; // renderizar en Light DOM (hereda estilos externos)
+    }
+    render() {
+        return html`<img src="${this.picture}" alt="${this.name}" />`;
+    }
+}
+if (!customElements.get('my-component')) {
+    customElements.define('my-component', myComponent);
+}
