@@ -60,5 +60,6 @@ export class AlbumCard extends LitElement {
     `;
   }
 }
-
-customElements.define('album-card', AlbumCard);
+if (!customElements.get('album-card')) {
+  customElements.define('album-card', AlbumCard);
+}

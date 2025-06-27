@@ -31,7 +31,7 @@
         const pageTitle = "Mis álbumes"
         
         async function getAlbums() {
-        
+            $f7.dialog.preloader();
             const res = await fetch('/api/pb/albums');
             if (res.ok) {
                 const response = await res.json();
@@ -50,9 +50,12 @@
                     const component = await loadComponent(container, 'album-card', attributes);
                    
                 }
+                $f7.dialog.close();
             } else {
                 console.log(res.statusText);
+                $f7.dialog.close();
             }
+            
         }
         const openAlbum = (id) => {
             console.log('openAlbum', id);

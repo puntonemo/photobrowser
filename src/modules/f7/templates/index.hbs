@@ -57,6 +57,7 @@
                 await import(`{{config.path}}/components/${component}.js`); // usa ruta relativa al host
 
             const el = document.createElement(component);
+            
             for (const entry of Object.entries(attributes)) 
                 el[entry[0]] = entry[1];
             
@@ -65,6 +66,7 @@
         
         }
         async function getProfile() {
+            app.f7.dialog.preloader();
             const res = await fetch('/api/auth/profile');
             if (res.ok) {
                 const response = await res.json();
@@ -72,11 +74,12 @@
             } else {
                 console.log(res.statusText);
             }
+            app.f7.dialog.close();
         }
         docReady(function () {
             // DOM is loaded and ready for manipulation here
             console.log('hello f7');
-            getProfile();
+            
 
             const routes = [
                 {
@@ -115,6 +118,7 @@
                 routes
             });
             var mainView = app.views.create('.view-main');
+            getProfile();
         });
     </script>
     <script src="https://cdn.framework7.io/packages/core/framework7-bundle.min.js"></script>

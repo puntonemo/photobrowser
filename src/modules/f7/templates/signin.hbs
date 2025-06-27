@@ -17,7 +17,7 @@
             <div class="block margin-top">
                 <p>Inicia sesión</p>
                 <div class="grid grid-cols-1 medium-grid-cols-3 grid-gap">
-                    <div><a href="/api/auth/passport/authUrl/google" class="external button button-fill">Google</a></div>
+                    <div><div @click=${signInButton} class="button button-fill">Google</div></div>
                 </div>
             </div>
         </div>
@@ -31,7 +31,11 @@
 <script>
     // script must return/export component function
     export default (props, { $f7, $on, $f7router }) => {
-        const pageTitle = "Inicio de sesión"
+        const pageTitle = "Inicio de sesión";
+
+        const signInButton = () => 
+            document.location = "/api/auth/passport/authUrl/google";
+        
         $on('pageInit', () => {
             // do something on page init
         });
