@@ -139,7 +139,6 @@ export class MediaItem {
     })
     locationTs!: Date;
 
-    @OneToMany(() => MediaAlbumItem, (mediaAlbumItem) => mediaAlbumItem.mediaAlbum)
-    @JoinColumn({ name: 'id', referencedColumnName: 'media_item_id' })
+    @OneToMany(() => MediaAlbumItem, (mediaAlbumItem) => mediaAlbumItem.mediaItem)
     mediaAlbums: MediaAlbumItem[];
 }

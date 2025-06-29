@@ -27,7 +27,7 @@ export class MediaAlbumItem {
     createdBy!: string;
 
     @ManyToOne(() => MediaItem, (mediaItem) => mediaItem.mediaAlbums)
-    @JoinColumn({ name: 'media_item_id', referencedColumnName: 'id' })
+    @JoinColumn({ name: 'media_item_id' })
     mediaItem: MediaItem;
 
     @ManyToOne(() => MediaAlbum, (mediaAlbum) => mediaAlbum.mediaItems)

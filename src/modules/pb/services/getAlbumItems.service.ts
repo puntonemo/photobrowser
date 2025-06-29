@@ -10,6 +10,6 @@ export const getAlbumItems = new CoreService(
     },
     async (request: CoreRequest) => {
         const { id } = request.params;
-        return getAlbumItemsController({ id, relations: true });
+        return getAlbumItemsController({ 'mediaAlbums.mediaAlbumId': id, mediaAlbums: true });
     },
 );

@@ -1,35 +1,6 @@
 import { DataSource, Repository, ObjectLiteral, FindOptionsWhere, In, IsNull } from 'typeorm';
-export class GenericFindDto {
-    // @Validate({ type: 'enum', values: columns, optional: true })
-    order!: string;
-
-    // @Validate('boolean|convert|optional')
-    ascending!: boolean;
-
-    // @Validate('number|min:1|default:1|convert|optional')
-    page: number = 1;
-
-    // @Validate('number|min:1|max:100|default:10|convert|optional')
-    pageSize: number = 10;
-
-    // @Validate('string|optional')
-    schema!: string;
-
-    // @Validate(['boolean|convert|optional', { type: 'enum', values: ['exact', 'planned', 'estimated'], optional: true }])
-    count: boolean = false;
-
-    // @Validate('boolean|default:true|convert|optional')
-    data: boolean = true;
-
-    // @Validate('boolean|convert|optional')
-    relations: boolean = false;
-}
-
-export type GenericRepositoryOptions = {
-    relations?: Array<string | Record<string, any>>;
-    filters?: string[];
-    defaultPageSize?: number;
-};
+import { GenericFindDto } from './findDto';
+import { GenericRepositoryOptions } from './types';
 
 export class GenericRepository<ENTITY extends ObjectLiteral, FindDTO extends FindOptionsWhere<ENTITY>> {
     public readonly repository: Repository<ENTITY>;
@@ -78,7 +49,12 @@ export class GenericRepository<ENTITY extends ObjectLiteral, FindDTO extends Fin
                     filters[relation] !== false ? filters.relations === true || filters[relation] === true : false;
             } else {
                 for (const entry of Object.entries(relation)) {
-                    findOptions.relations[entry[0]] = filters[entry[0]] && filters[entry[0]] !== false ? entry[1] : filters.relations === true ? entry[1] : false;
+                    findOptions.relations[entry[0]] =
+                        filters[entry[0]] && filters[entry[0]] !== false
+                            ? entry[1]
+                            : filters.relations === true
+                              ? entry[1]
+                              : false;
                 }
             }
         }

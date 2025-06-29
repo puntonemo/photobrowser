@@ -3,4 +3,6 @@ export class MediaItemFindDto {
     userId!: string;
     sourceId!: string;
     signature!: string;
+    mediaAlbums!: boolean;
+    'mediaAlbums.mediaAlbumId'!: string;
 }

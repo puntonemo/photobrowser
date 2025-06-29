@@ -1,9 +1,9 @@
 import { DataSource } from 'typeorm';
-import { GenericRepository } from './_gen/repository';
+import { GenericRepository, QBGenericRepository } from './_gen';
 import * as entities from './entities';
 import { User, UsersFindDto, UsersRepositoryOptions } from './Users';
 import { UserCredential, UserCredentialsFindDto } from './UserCredentials';
-import { MediaItem, MediaItemFindDto } from './MediaItems';
+import { MediaItem, MediaItemFindDto, MediaItemsOptions } from './MediaItems';
 import { MediaSource, MediaSourceFindDto } from './MediaSources';
 import { MediaItemTag, MediaItemTagFindDto } from './MediaItemTags';
 import { MediaAlbum, MediaAlbumFindDto, MediaAlbumOptions } from './MediaAlbums';
@@ -12,9 +12,9 @@ export const Repositories: {
     Users: GenericRepository<User, UsersFindDto>;
     UserCredentials: GenericRepository<UserCredential, UserCredentialsFindDto>;
     MediaSources: GenericRepository<MediaSource, MediaSourceFindDto>;
-    MediaItems: GenericRepository<MediaItem, MediaItemFindDto>;
+    MediaItems: QBGenericRepository<MediaItem, MediaItemFindDto>;
     MediaItemTags: GenericRepository<MediaItemTag, MediaItemTagFindDto>;
-    MediaAlbums: GenericRepository<MediaAlbum, MediaAlbumFindDto>;
+    MediaAlbums: QBGenericRepository<MediaAlbum, MediaAlbumFindDto>;
 } = {} as any;
 
 /**
@@ -28,9 +28,9 @@ function RepositoriesInit(dataSource: DataSource) {
         UserCredential,
     );
     Repositories.MediaSources = new GenericRepository<MediaSource, MediaSourceFindDto>(dataSource, MediaSource);
-    Repositories.MediaItems = new GenericRepository<MediaItem, MediaItemFindDto>(dataSource, MediaItem);
+    Repositories.MediaItems = new QBGenericRepository<MediaItem, MediaItemFindDto>(dataSource, MediaItem, MediaItemsOptions);
     Repositories.MediaItemTags = new GenericRepository<MediaItemTag, MediaItemTagFindDto>(dataSource, MediaItemTag);
-    Repositories.MediaAlbums = new GenericRepository<MediaAlbum, MediaAlbumFindDto>(
+    Repositories.MediaAlbums = new QBGenericRepository<MediaAlbum, MediaAlbumFindDto>(
         dataSource,
         MediaAlbum,
         MediaAlbumOptions,
