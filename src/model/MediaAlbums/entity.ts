@@ -1,3 +1,4 @@
+import { MediaAlbumItem } from 'model/MediaAlbumItems';
 import { UsersMediaAlbums } from 'model/UsersMediaAlbums';
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn } from 'typeorm';
 
@@ -28,4 +29,8 @@ export class MediaAlbum {
     @OneToMany(() => UsersMediaAlbums, (usersMediaAlbums) => usersMediaAlbums.mediaAlbum)
     @JoinColumn({ name: 'id', referencedColumnName: 'media_album_id' })
     mediaAlbums: UsersMediaAlbums[];
+
+    @OneToMany(() => MediaAlbumItem, (mediaAlbumItem) => mediaAlbumItem.mediaAlbum)
+    @JoinColumn({ name: 'id', referencedColumnName: 'media_album_id' })
+    mediaItems: MediaAlbumItem[];
 }

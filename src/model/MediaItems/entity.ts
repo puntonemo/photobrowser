@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { MediaAlbumItem } from 'model/MediaAlbumItems';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn } from 'typeorm';
 
 @Entity('media_items')
 export class MediaItem {
@@ -137,4 +138,8 @@ export class MediaItem {
         },
     })
     locationTs!: Date;
+
+    @OneToMany(() => MediaAlbumItem, (mediaAlbumItem) => mediaAlbumItem.mediaAlbum)
+    @JoinColumn({ name: 'id', referencedColumnName: 'media_item_id' })
+    mediaAlbums: MediaAlbumItem[];
 }

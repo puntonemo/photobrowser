@@ -6,8 +6,7 @@ import { UserCredential, UserCredentialsFindDto } from './UserCredentials';
 import { MediaItem, MediaItemFindDto } from './MediaItems';
 import { MediaSource, MediaSourceFindDto } from './MediaSources';
 import { MediaItemTag, MediaItemTagFindDto } from './MediaItemTags';
-import { MediaAlbum, MediaAlbumFindDto } from './MediaAlbums';
-import { MediaAlbumItem, MediaAlbumItemFindDto } from './MediaAlbumItems';
+import { MediaAlbum, MediaAlbumFindDto, MediaAlbumOptions } from './MediaAlbums';
 
 export const Repositories: {
     Users: GenericRepository<User, UsersFindDto>;
@@ -16,7 +15,6 @@ export const Repositories: {
     MediaItems: GenericRepository<MediaItem, MediaItemFindDto>;
     MediaItemTags: GenericRepository<MediaItemTag, MediaItemTagFindDto>;
     MediaAlbums: GenericRepository<MediaAlbum, MediaAlbumFindDto>;
-    MediaAlbumItems: GenericRepository<MediaAlbumItem, MediaAlbumItemFindDto>;
 } = {} as any;
 
 /**
@@ -32,10 +30,10 @@ function RepositoriesInit(dataSource: DataSource) {
     Repositories.MediaSources = new GenericRepository<MediaSource, MediaSourceFindDto>(dataSource, MediaSource);
     Repositories.MediaItems = new GenericRepository<MediaItem, MediaItemFindDto>(dataSource, MediaItem);
     Repositories.MediaItemTags = new GenericRepository<MediaItemTag, MediaItemTagFindDto>(dataSource, MediaItemTag);
-    Repositories.MediaAlbums = new GenericRepository<MediaAlbum, MediaAlbumFindDto>(dataSource, MediaAlbum);
-    Repositories.MediaAlbumItems = new GenericRepository<MediaAlbumItem, MediaAlbumItemFindDto>(
+    Repositories.MediaAlbums = new GenericRepository<MediaAlbum, MediaAlbumFindDto>(
         dataSource,
-        MediaAlbumItem,
+        MediaAlbum,
+        MediaAlbumOptions,
     );
 }
 

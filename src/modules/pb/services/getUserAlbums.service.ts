@@ -9,6 +9,6 @@ export const getUserAlbums = new CoreService(
         },
     },
     async () => {
-        return getUserAlbumsController();
+        return getUserAlbumsController('1');
     },
 );

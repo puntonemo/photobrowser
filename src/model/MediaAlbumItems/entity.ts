@@ -1,4 +1,6 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { MediaAlbum } from 'model/MediaAlbums';
+import { MediaItem } from 'model/MediaItems';
+import { Entity, PrimaryColumn, Column, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity('media_album_items')
 export class MediaAlbumItem {
@@ -23,4 +25,12 @@ export class MediaAlbumItem {
 
     @Column('bigint', { name: 'created_by' })
     createdBy!: string;
+
+    @ManyToOne(() => MediaItem, (mediaItem) => mediaItem.mediaAlbums)
+    @JoinColumn({ name: 'media_item_id', referencedColumnName: 'id' })
+    mediaItem: MediaItem;
+
+    @ManyToOne(() => MediaAlbum, (mediaAlbum) => mediaAlbum.mediaItems)
+    @JoinColumn({ name: 'media_album_id', referencedColumnName: 'id' })
+    mediaAlbum: MediaAlbum;
 }
