@@ -5,7 +5,9 @@ export async function DTOtransformer(response: any, request: CoreRequest, servic
     try {
         const metaSchema = request.params.schema ?? service?.meta?.schema;
         const schema = Array.isArray(metaSchema) ? metaSchema : [metaSchema];
-        const validated = await DTOValidator.validate(response, ...schema);
+        const validated = await DTOValidator.validate(response, ...schema).catch((error) => {
+            return BadRequestResponseError(error);
+        });;
         return validated;
     } catch (error) {
         return BadRequestResponseError(error);
