@@ -5,6 +5,7 @@ export const getAlbumItems = new CoreService(
     {
         get: '/api/pb/albums/:id/items',
         meta: {
+            schema: 'list',
             public: true,
         },
     },

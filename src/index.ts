@@ -12,6 +12,7 @@ import testModule from '@modules/test';
 import authModule from '@modules/auth';
 import pbModule from '@modules/pb';
 import f7Module from '@modules/f7';
+import { DTOtransformer } from '@lib/database';
 
 // __dirname en ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -69,6 +70,8 @@ AppDataSourceInit(AppDataSourceInitOptions).then(async () => {
 
     fastifyEngine.registerReactApp('/app');
     fastifyEngine.staticApp('static', '/f7');
+
+    fastifyEngine.registerTransformer(DTOtransformer);
 
     await fastifyEngine.registerModule(testModule);
     await fastifyEngine.registerModule(authModule);

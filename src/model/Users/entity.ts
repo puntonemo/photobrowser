@@ -1,41 +1,46 @@
+import { Entity, PrimaryGeneratedColumn, OneToMany, JoinColumn, Validate, ValidateOptions } from '@lib/database';
 import { UsersMediaAlbums } from 'model/UsersMediaAlbums';
 import { UserCredential } from 'model/UserCredentials';
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 
+@ValidateOptions({ strict: true, async: true })
 @Entity('users')
 export class User {
+    @Validate('number|convert|optional')
     @PrimaryGeneratedColumn()
     id!: string;
 
-    @Column('varchar')
+    @Validate('string|optional')
     username!: string;
 
-    @Column('varchar')
+    @Validate('string|optional')
     firstname!: string;
 
-    @Column('varchar')
+    @Validate('string|optional')
     lastname!: string;
 
-    @Column('varchar')
+    @Validate('string|optional')
     picture!: string;
 
-    @Column('varchar')
+    @Validate('string|optional')
     googleid!: string;
 
-    @Column('varchar')
+    @Validate('string|optional')
     liveid!: string;
 
-    @Column('json')
+    @Validate('object|optional')
     profile!: Record<string, any>;
 
+    @Validate('string|optional')
     get displayname() {
         return `${this.firstname} ${this.lastname}`.trim();
     }
 
+    @Validate({ type: 'dto', dto: UserCredential, optional: true }) // DTO validation requires async validation
     @OneToMany(() => UserCredential, (credential) => credential.user)
     @JoinColumn({ name: 'id', referencedColumnName: 'user_id' })
     credentials: UserCredential[];
 
+    @Validate({ type: 'dto', dto: UsersMediaAlbums, optional: true }) // DTO validation requires async validation
     @OneToMany(() => UsersMediaAlbums, (usersMediaAlbums) => usersMediaAlbums.user)
     @JoinColumn({ name: 'id', referencedColumnName: 'user_id' })
     mediaAlbums: UsersMediaAlbums[];
