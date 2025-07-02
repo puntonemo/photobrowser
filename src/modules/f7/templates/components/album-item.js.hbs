@@ -1,0 +1,27 @@
+import { LitElement, html, css } from 'https://unpkg.com/lit@latest?module';
+
+class albumItem extends LitElement {
+    static properties = {
+        id: { type: String },
+    };
+    static styles = css`
+    `;
+
+    connectedCallback() {
+        super.connectedCallback();
+        const requiredProps = ['id'];
+
+        for (const prop of requiredProps) 
+            if (this[prop] === undefined || this[prop] === null) 
+                throw new Error(`<album-item> requiere la propiedad "${prop}"`);
+    }
+    createRenderRoot() {
+        return this; // renderizar en Light DOM (hereda estilos externos)
+    }
+    render() {
+        return html`<div class="item">${this.id}</div>`;
+    }
+}
+if (!customElements.get('album-item')) {
+    customElements.define('album-item', albumItem);
+}

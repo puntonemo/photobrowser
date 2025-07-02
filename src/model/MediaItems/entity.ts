@@ -81,14 +81,17 @@ export class MediaItem {
     })
     momentTs!: Date;
 
+    @Schema('list')
     @Validate('string|optional')
     @Column('varchar', { name: 'moment_year' })
     momentYear!: string;
 
+    @Schema('list')
     @Validate('string|optional')
     @Column('varchar', { name: 'moment_month' })
     momentMonth!: string;
 
+    @Schema('list')
     @Validate('string|optional')
     @Column('varchar', { name: 'moment_day' })
     momentDay!: string;
@@ -115,6 +118,7 @@ export class MediaItem {
     @Column('varchar', { name: 'location_status' })
     locationStatus!: string;
 
+    @Schema('list')
     @Validate('string|optional')
     @Column('varchar', { name: 'location_label' })
     locationLabel!: string;

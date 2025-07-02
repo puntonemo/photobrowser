@@ -44,7 +44,7 @@ export class AlbumCard extends LitElement {
   }
   render() {
     return html`
-      <div class="card demo-card-header-pic" @click=${() => this.openAlbum?.(this.id)}>
+      <div class="card demo-card-header-pic" @click=${() => this.openAlbum?.({id: this.id, title: this.title})}>
         <div style="background-image:url(https://cdn.framework7.io/placeholder/people-1000x600-${this.id}.jpg)" valign="bottom" class="card-header">${this.title}</div>
         <div class="card-content card-content-padding">
           <p class="date">${this.role} · ${new Date(this.createdAt).toLocaleString()}</p>

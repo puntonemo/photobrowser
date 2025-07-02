@@ -57,8 +57,11 @@
             }
             
         }
-        const openAlbum = (id) => {
+        const openAlbum = (props) => {
+            const { id, title } = props;
             console.log('openAlbum', id);
+            
+            app.f7.views.main.router.navigate(`/albumItems/${id}`, {props: {title}});
         }
         $on('pageInit', () => {
             getAlbums();
