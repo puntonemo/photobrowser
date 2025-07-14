@@ -114,12 +114,19 @@
     // script must return/export component function
     export default (props, { $f7, $on, $f7router }) => {
         let pageTitle = props.title ?? "Album Items"
-
+        let albumItems = [];
+        const openItem = (itemProps) => {
+            const { id } = itemProps;
+            console.log('openItem', itemProps);
+            
+            app.f7.views.main.router.navigate(`/browse/${props.id}`, {props: {itemId:id, albumItems}});
+        }
         async function addItem(group, id) {
             const container = document.querySelector(`#ai-grid-${group}`);
             if(container) {
                 const attributes = {
                     'id': id,
+                    'openItem': openItem
                 }
                 return await loadComponent(container, 'album-item', attributes);
             }
@@ -143,6 +150,7 @@
             if (res.ok) {
                 const response = await res.json();
                 console.log(response);
+                albumItems.push(...response.data);
                 for (const item of response.data) {
                     const group = `${item.momentYear}${item.momentMonth}`;
                     const title = `${item.momentMonth}-${item.momentYear}`;
@@ -165,9 +173,10 @@
         }
 
         $on('pageInit', () => {
-            console.log(props);
+            console.log('albumItems', props);
             const { id, title } = props;
             if (title) pageTitle = title;
+            albumItems = [];
             getAlbumItems(id);
         });
         $on('pageAfterOut', () => {

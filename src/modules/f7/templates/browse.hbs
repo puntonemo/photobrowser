@@ -1,0 +1,156 @@
+<!-- component template, uses same tagged template literals -->
+<template>
+    <div class="page">
+        <div class="page-content">
+            <!-- Swiper -->
+            <div class="swiper">
+                <div class="swiper-wrapper"></div>
+            </div>
+            <div class="nav-layer">
+                <i @click=${goBack} class="icon icon-back"></i>
+            </div>
+        </div>
+    </div>
+</template>
+<!-- component styles -->
+<style>
+.nav-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 20px;
+    z-index: 2;
+}
+/*** SWIPER ***/
+.swiper {
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.swiper-slide {
+    text-align: center;
+    font-size: 18px;
+    background: #444;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.append-buttons {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.append-buttons a {
+    display: inline-block;
+    border: 1px solid #007aff;
+    color: #007aff;
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin: 0 10px;
+    font-size: 13px;
+}
+/*** ***/
+.info-wrapper {
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+}
+/*** FADE ANIMATIONS ***/
+.fade {
+    animation-duration: 0.5s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+}
+
+.fade.show {
+    animation-name: fadeIn;
+}
+
+.fade.hidden {
+    animation-name: fadeOut;
+}
+
+/*** KEYFRAMES ***/
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        visibility: hidden;
+    }
+    to {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        visibility: visible;
+    }
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+</style>
+<!-- rest of component logic -->
+<script>
+    // script must return/export component function
+    /*
+    
+    */
+    export default (props, { $f7, $on, $f7router }) => {
+        const goBack = () => {
+            app.f7.views.main.router.back();
+        }
+        
+        $on('pageInit', () => {
+            // do something on page init
+            console.log('browse', props);
+            const initialSlide = props.albumItems.findIndex((i)=>i.id === props.itemId);
+            console.log('initialSlide', initialSlide);
+            const slides = props.albumItems.map((i)=>{
+                return `
+                <div class="swiper-zoom-container">
+                    <img src="https://swiperjs.com/demos/images/nature-4.jpg" />
+                </div>
+                <div class="info-wrapper fade">
+                    <p class="append-buttons">
+                        <a href="#" >${i.basename}</a>
+                    </p>
+                    <p>${i.fileSizeString}</p>
+                    <p>${i.locationLabel}</p>
+                </div>
+                `;
+            });
+            console.log('slides', slides);
+            
+            const swiper = new Swiper('.swiper', {
+                zoom: true,
+                slidesPerView: 1,
+                centeredSlides: true,
+                virtual: {
+                    slides: slides,
+                },
+                initialSlide: initialSlide,
+                on: {
+                    init: function () {
+                        console.log('swiper initialized');
+                    },
+                },
+            });
+
+            window.swiper = swiper;
+            
+        });
+        $on('pageAfterOut', () => {
+            // page has left the view
+        });
+
+        // component function must return render function
+        return $render;
+    }
+</script>
