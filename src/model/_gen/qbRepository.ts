@@ -3,6 +3,8 @@ import { GenericFindDto } from './findDto';
 import { GenericRepositoryOptions } from './types';
 
 export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends FindOptionsWhere<ENTITY>> {
+    public readonly dataSource: DataSource;
+    public readonly entity: { new (): ENTITY };
     public readonly repository: Repository<ENTITY>;
     public readonly entityName: string;
     public readonly relations: Array<string | Record<string, any>>;
@@ -10,6 +12,8 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
     public readonly defaultPageSize: number;
 
     constructor(dataSource: DataSource, entity: { new (): ENTITY }, options?: GenericRepositoryOptions) {
+        this.dataSource = dataSource;
+        this.entity = entity;
         this.repository = dataSource.getRepository(entity);
         this.entityName = options?.entityName ?? entity.name;
         this.relations = options?.relations ?? [];
@@ -70,7 +74,21 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
         data?: ENTITY[];
         count?: number;
     }> {
-        const qb = this.repository.createQueryBuilder(this.entityName);
+        let qb = this.repository.createQueryBuilder(this.entityName);
+
+        if (
+            filters.schema &&
+            this.entity.prototype.constructor._schemas &&
+            this.entity.prototype.constructor._schemas[filters.schema]
+        ) {
+            const schemaColumns = this.entity.prototype.constructor._schemas[filters.schema];
+
+            const columns = this.intersection(schemaColumns, this.getEntityColumns()).map((i) =>
+                [this.entityName, i].join('.'),
+            );
+
+            qb = qb.select(columns);
+        }
 
         const findResult: {
             data?: ENTITY[];
@@ -87,32 +105,32 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
         this.applyRelations(qb, this.entityName, this.relations, filters, aliasMap);
 
         if (filters.order) {
-            qb.addOrderBy(filters.order, (filters.ascending ?? true) ? 'ASC' : 'DESC');
+            qb = qb.addOrderBy(filters.order, (filters.ascending ?? true) ? 'ASC' : 'DESC');
         }
 
         // ilike filter with search
         // if (filters.search) {
         //     qb.andWhere(`${this.entityName}.email ILIKE :search OR ${this.entityName}.username ILIKE :search`, { search: `%${filters.search}%` });
         // }
-        
+
         this.filters.forEach((filter) => {
             const value = filters[filter];
             if (value !== undefined) {
                 const parameterKey = filter.replace(/\./g, '_');
-                // const path = aliasMap[filter.split('.').slice(0, -1).join('.')] 
+                // const path = aliasMap[filter.split('.').slice(0, -1).join('.')]
                 //     ? `${aliasMap[filter.split('.').slice(0, -1).join('.')!]}.${filter.split('.').slice(-1)[0]}`
                 //     : `${this.entityName}.${filter}`;
                 const path = filter;
                 if (Array.isArray(value)) {
-                    qb.andWhere(`${path} IN (:...${parameterKey})`, { [parameterKey]: value });
+                    qb = qb.andWhere(`${path} IN (:...${parameterKey})`, { [parameterKey]: value });
                 } else {
-                    qb.andWhere(`${path} = :${parameterKey}`, { [parameterKey]: value });
+                    qb = qb.andWhere(`${path} = :${parameterKey}`, { [parameterKey]: value });
                 }
             }
         });
 
-        qb.skip(skip);
-        qb.take(pageSize);
+        qb = qb.skip(skip);
+        qb = qb.take(pageSize);
 
         if (!filters.count) {
             const result = await qb.getMany();
@@ -130,5 +148,16 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
     public async exists(filters: Partial<FindDTO>): Promise<boolean | null> {
         const data = await this.find({ ...filters, data: false, count: true } as FindDTO & GenericFindDto);
         return data.count ? data.count > 0 : false;
+    }
+    public getEntityColumns(): string[] {
+        const metadata = this.dataSource.getMetadata(this.entity);
+        return metadata.columns.map((column) => column.propertyName);
+    }
+    /*************/
+    /*** UTILS ***/
+    /*************/
+    private intersection<T>(a: T[], b: T[]): T[] {
+        const setB = new Set(b);
+        return a.filter((item) => setB.has(item));
     }
 }

@@ -9,7 +9,7 @@ import { MediaItemTag, MediaItemTagFindDto } from './MediaItemTags';
 import { MediaAlbum, MediaAlbumFindDto, MediaAlbumOptions } from './MediaAlbums';
 
 export const Repositories: {
-    Users: GenericRepository<User, UsersFindDto>;
+    Users: QBGenericRepository<User, UsersFindDto>;
     UserCredentials: GenericRepository<UserCredential, UserCredentialsFindDto>;
     MediaSources: GenericRepository<MediaSource, MediaSourceFindDto>;
     MediaItems: QBGenericRepository<MediaItem, MediaItemFindDto>;
@@ -22,7 +22,7 @@ export const Repositories: {
  * @param AppDataSource DataSource
  */
 function RepositoriesInit(dataSource: DataSource) {
-    Repositories.Users = new GenericRepository<User, UsersFindDto>(dataSource, User, UsersRepositoryOptions);
+    Repositories.Users = new QBGenericRepository<User, UsersFindDto>(dataSource, User, UsersRepositoryOptions);
     Repositories.UserCredentials = new GenericRepository<UserCredential, UserCredentialsFindDto>(
         dataSource,
         UserCredential,

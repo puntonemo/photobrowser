@@ -1,4 +1,4 @@
-import { GenericRepositoryOptions } from 'model/_gen/repository';
+import { GenericRepositoryOptions } from 'model/_gen';
 
 export * from './entity';
 export * from './findDto';

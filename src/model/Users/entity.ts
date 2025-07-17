@@ -1,24 +1,30 @@
-import { Entity, PrimaryGeneratedColumn, OneToMany, JoinColumn, Validate, ValidateOptions } from '@lib/database';
+import { Entity, PrimaryGeneratedColumn, OneToMany, JoinColumn, Validate, ValidateOptions, Schema, Column } from '@lib/database';
 import { UsersMediaAlbums } from 'model/UsersMediaAlbums';
 import { UserCredential } from 'model/UserCredentials';
 
 @ValidateOptions({ strict: true, async: true })
 @Entity('users')
 export class User {
+    @Schema('list')
     @Validate('number|convert|optional')
     @PrimaryGeneratedColumn()
     id!: string;
 
+    @Schema('list')
     @Validate('string|optional')
+    @Column('varchar')
     username!: string;
 
     @Validate('string|optional')
+    @Column('varchar')
     firstname!: string;
 
     @Validate('string|optional')
+    @Column('varchar')
     lastname!: string;
 
     @Validate('string|optional')
+    @Column('varchar')
     picture!: string;
 
     @Validate('string|optional')
