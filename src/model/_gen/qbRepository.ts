@@ -31,64 +31,114 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
         return this.repository.save(newEntity);
     }
 
-    private applyRelations(
-        qb: ReturnType<Repository<ENTITY>['createQueryBuilder']>,
-        entityAlias: string,
-        relations: GenericRepositoryOptions['relations'],
-        filters: Record<string, any>,
-        aliasMap: Record<string, string>,
-        parentPath: string = entityAlias,
-    ) {
-        const join = (path: string, alias: string) => {
-            if (!qb.expressionMap.joinAttributes.some((j) => j.alias.name === alias)) {
-                qb.leftJoinAndSelect(path, alias);
-                aliasMap[path] = alias;
-            }
-        };
-
-        if (relations)
-            for (const relation of relations) {
-                if (typeof relation === 'string') {
-                    const include =
-                        filters[relation] !== false ? filters.relations === true || filters[relation] === true : false;
-                    if (include) {
-                        const path = `${parentPath}.${relation}`;
-                        join(path, relation);
-                    }
-                } else {
-                    for (const [key, value] of Object.entries(relation)) {
-                        const include =
-                            filters[key] !== false ? filters.relations === true || filters[key] === true : false;
-                        if (include) {
-                            const path = `${parentPath}.${key}`;
-                            join(path, key);
-                            if (typeof value === 'object') {
-                                this.applyRelations(qb, key, [value], filters, aliasMap, key);
-                            }
-                        }
-                    }
-                }
-            }
-    }
     public async find(filters: Partial<FindDTO & GenericFindDto>): Promise<{
         data?: ENTITY[];
         count?: number;
     }> {
-        let qb = this.repository.createQueryBuilder(this.entityName);
-
-        if (
-            filters.schema &&
-            this.entity.prototype.constructor._schemas &&
-            this.entity.prototype.constructor._schemas[filters.schema]
-        ) {
-            const schemaColumns = this.entity.prototype.constructor._schemas[filters.schema];
-
-            const columns = this.intersection(schemaColumns, this.getEntityColumns()).map((i) =>
-                [this.entityName, i].join('.'),
-            );
-
-            qb = qb.select(columns);
+        function intersection<T>(a: T[], b: T[]): T[] {
+            const setB = new Set(b);
+            return a.filter((item) => setB.has(item));
         }
+        function getSchemaColumns(dataSource: DataSource, entityAlias: string, relationName: string, schema: string) {
+            const metadata = dataSource.getMetadata(entityAlias);
+            if (metadata && metadata.relations) {
+                const relation = metadata.relations.find((r) => r.propertyName === relationName);
+                if (schema && relation && relation.type && (relation.type as any)._schemas) {
+                    const relationMetadata = dataSource.getMetadata(relation.type);
+                    if (relationMetadata) {
+                        const schemaColumns: any = (relation.type as any)._schemas[schema];
+                        const relationColumns = relationMetadata.columns.map((column) => column.propertyName);
+                        if (schemaColumns) {
+                            const columns = intersection(schemaColumns, relationColumns).map((i) =>
+                                [relationName, i].join('.'),
+                            );
+                            return columns;
+                        }
+                    }
+                }
+            }
+            return [];
+        }
+        function getRelatedColumns(
+            dataSource: DataSource,
+            entityAlias: string,
+            relations: GenericRepositoryOptions['relations'],
+            filters: Record<string, any>,
+            parentPath: string = entityAlias,
+        ) {
+            const relatedColumns: string[] = [];
+
+            if (relations)
+                for (const relation of relations) {
+                    if (typeof relation === 'string') {
+                        const include =
+                            filters[relation] !== false
+                                ? filters.relations === true || filters[relation] === true
+                                : false;
+                        if (include) {
+                            const columns = getSchemaColumns(dataSource, parentPath, relation, filters.schema);
+                            relatedColumns.push(...columns);
+                        }
+                    } else {
+                        for (const [key, value] of Object.entries(relation)) {
+                            const include =
+                                filters[key] !== false ? filters.relations === true || filters[key] === true : false;
+                            if (include) {
+                                const columns = getSchemaColumns(dataSource, parentPath, key, filters.schema);
+                                relatedColumns.push(...columns);
+                                if (typeof value === 'object') {
+                                    const childColumns = getRelatedColumns(dataSource, key, [value], filters, key);
+                                    relatedColumns.push(...childColumns);
+                                }
+                            }
+                        }
+                    }
+                }
+            return relatedColumns;
+        }
+        function applyRelations(
+            dataSource: DataSource,
+            qb: ReturnType<Repository<ENTITY>['createQueryBuilder']>,
+            entityAlias: string,
+            relations: GenericRepositoryOptions['relations'],
+            filters: Record<string, any>,
+            aliasMap: Record<string, string>,
+            parentPath: string = entityAlias,
+        ) {
+            const joinAndSelect = (path: string, alias: string) => {
+                if (!qb.expressionMap.joinAttributes.some((j) => j.alias.name === alias)) {
+                    qb.leftJoinAndSelect(path, alias);
+                    aliasMap[path] = alias;
+                }
+            };
+
+            if (relations)
+                for (const relation of relations) {
+                    if (typeof relation === 'string') {
+                        const include =
+                            filters[relation] !== false
+                                ? filters.relations === true || filters[relation] === true
+                                : false;
+                        if (include) {
+                            const path = `${parentPath}.${relation}`;
+                            joinAndSelect(path, relation);
+                        }
+                    } else {
+                        for (const [key, value] of Object.entries(relation)) {
+                            const include =
+                                filters[key] !== false ? filters.relations === true || filters[key] === true : false;
+                            if (include) {
+                                const path = `${parentPath}.${key}`;
+                                joinAndSelect(path, key);
+                                if (typeof value === 'object') {
+                                    applyRelations(dataSource, qb, key, [value], filters, aliasMap, key);
+                                }
+                            }
+                        }
+                    }
+                }
+        }
+        let qb = this.repository.createQueryBuilder(this.entityName);
 
         const findResult: {
             data?: ENTITY[];
@@ -102,7 +152,30 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
         const skip = (page - 1) * pageSize;
 
         const aliasMap: Record<string, string> = {};
-        this.applyRelations(qb, this.entityName, this.relations, filters, aliasMap);
+
+        /*** SELECT COLUMNS ***/
+        const selectColumns: string[] = [];
+        if (
+            filters.schema &&
+            this.entity.prototype.constructor._schemas &&
+            this.entity.prototype.constructor._schemas[filters.schema]
+        ) {
+            const schemaColumns = this.entity.prototype.constructor._schemas[filters.schema];
+
+            const columns = intersection(schemaColumns, this.getEntityColumns()).map((i) =>
+                [this.entityName, i].join('.'),
+            );
+
+            selectColumns.push(...columns);
+        }
+        const relatedColumns = getRelatedColumns(this.dataSource, this.entityName, this.relations, filters);
+        
+        selectColumns.push(...relatedColumns);
+
+        if (selectColumns.length > 0) qb = qb.select(selectColumns);
+
+        /*** APPLY RELATIONS ***/
+        applyRelations(this.dataSource, qb, this.entityName, this.relations, filters, aliasMap);
 
         if (filters.order) {
             qb = qb.addOrderBy(filters.order, (filters.ascending ?? true) ? 'ASC' : 'DESC');
@@ -156,8 +229,4 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
     /*************/
     /*** UTILS ***/
     /*************/
-    private intersection<T>(a: T[], b: T[]): T[] {
-        const setB = new Set(b);
-        return a.filter((item) => setB.has(item));
-    }
 }

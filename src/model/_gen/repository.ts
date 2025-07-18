@@ -3,6 +3,8 @@ import { GenericFindDto } from './findDto';
 import { GenericRepositoryOptions } from './types';
 
 export class GenericRepository<ENTITY extends ObjectLiteral, FindDTO extends FindOptionsWhere<ENTITY>> {
+    public readonly dataSource: DataSource;
+    public readonly entity: { new (): ENTITY };
     public readonly repository: Repository<ENTITY>;
     public readonly entityName: string;
     public readonly relations: Array<string | Record<string, any>>;
@@ -11,6 +13,8 @@ export class GenericRepository<ENTITY extends ObjectLiteral, FindDTO extends Fin
 
     constructor(dataSource: DataSource, entity: { new (): ENTITY }, options?: GenericRepositoryOptions) {
         console.log(`GenericRepository for`, entity.name);
+        this.dataSource = dataSource;
+        this.entity = entity;
         this.repository = dataSource.getRepository(entity);
         this.entityName = entity.name;
         this.relations = options?.relations ?? [];

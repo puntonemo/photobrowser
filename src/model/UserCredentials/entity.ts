@@ -1,14 +1,16 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, Validate, ValidateOptions } from '@lib/database';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, Validate, ValidateOptions, Schema } from '@lib/database';
 import { User } from 'model/Users';
 
 @ValidateOptions({ strict: true, async: true })
 @Entity('user_credentials')
 export class UserCredential {
+    @Schema('list')
     @Validate('number|convert|optional')
     @PrimaryColumn('bigint', { name: 'user_id' })
     userId!: string;
 
     @Validate('string|optional')
+    @Schema('list')
     @PrimaryColumn('varchar', { name: 'credential_id' })
     credentialId!: string;
 
