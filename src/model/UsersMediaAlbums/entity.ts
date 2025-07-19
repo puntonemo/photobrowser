@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, JoinColumn, ManyToOne, Validate, ValidateOptions } from '@lib/database';
+import { Entity, PrimaryColumn, Column, JoinColumn, ManyToOne, Validate, ValidateOptions, Schema } from '@lib/database';
 import { MediaAlbum } from 'model/MediaAlbums';
 import { User } from 'model/Users';
 
@@ -13,6 +13,7 @@ export class UsersMediaAlbums {
     @PrimaryColumn('bigint', { name: 'media_album_id' })
     mediaAlbumId!: string;
 
+    @Schema('list')
     @Validate('string')
     @Column('varchar')
     role: string;

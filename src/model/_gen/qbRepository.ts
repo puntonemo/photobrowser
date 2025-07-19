@@ -43,17 +43,20 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
             const metadata = dataSource.getMetadata(entityAlias);
             if (metadata && metadata.relations) {
                 const relation = metadata.relations.find((r) => r.propertyName === relationName);
-                if (schema && relation && relation.type && (relation.type as any)._schemas) {
+                if (schema && relation && relation.type) {
                     const relationMetadata = dataSource.getMetadata(relation.type);
                     if (relationMetadata) {
-                        const schemaColumns: any = (relation.type as any)._schemas[schema];
                         const relationColumns = relationMetadata.columns.map((column) => column.propertyName);
-                        if (schemaColumns) {
-                            const columns = intersection(schemaColumns, relationColumns).map((i) =>
-                                [relationName, i].join('.'),
-                            );
-                            return columns;
+                        if ((relation.type as any)._schemas) {
+                            const schemaColumns: any = (relation.type as any)._schemas[schema];
+                            if (schemaColumns) {
+                                const columns = intersection(schemaColumns, relationColumns).map((i) =>
+                                    [relationName, i].join('.'),
+                                );
+                                return columns;
+                            }
                         }
+                        return relationColumns.map((i) => [relationName, i].join('.'));
                     }
                 }
             }
@@ -131,7 +134,7 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
                                 const path = `${parentPath}.${key}`;
                                 joinAndSelect(path, key);
                                 if (typeof value === 'object') {
-                                    applyRelations(dataSource, qb, key, [value], filters, aliasMap, key);
+                                    applyRelations(dataSource, qb, key, [value], relation[key], aliasMap, key);
                                 }
                             }
                         }
@@ -153,6 +156,9 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
 
         const aliasMap: Record<string, string> = {};
 
+        /*** APPLY RELATIONS ***/
+        applyRelations(this.dataSource, qb, this.entityName, this.relations, filters, aliasMap);
+
         /*** SELECT COLUMNS ***/
         const selectColumns: string[] = [];
         if (
@@ -169,13 +175,12 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
             selectColumns.push(...columns);
         }
         const relatedColumns = getRelatedColumns(this.dataSource, this.entityName, this.relations, filters);
-        
+
         selectColumns.push(...relatedColumns);
 
-        if (selectColumns.length > 0) qb = qb.select(selectColumns);
+        console.log('selectColumns', selectColumns);
 
-        /*** APPLY RELATIONS ***/
-        applyRelations(this.dataSource, qb, this.entityName, this.relations, filters, aliasMap);
+        if (selectColumns.length > 0) qb = qb.select(selectColumns);
 
         if (filters.order) {
             qb = qb.addOrderBy(filters.order, (filters.ascending ?? true) ? 'ASC' : 'DESC');
@@ -187,7 +192,9 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
         // }
 
         this.filters.forEach((filter) => {
-            const value = filters[filter];
+            const uniqueValue =
+                filter.split('.').length === 0 ? `${this.entityName}.${filter}` : filter.split('.').splice(-1)[0];
+            const value = filters[filter] || filters[uniqueValue];
             if (value !== undefined) {
                 const parameterKey = filter.replace(/\./g, '_');
                 // const path = aliasMap[filter.split('.').slice(0, -1).join('.')]

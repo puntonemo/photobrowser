@@ -5,5 +5,5 @@ export * from './findDto';
 
 export const UsersRepositoryOptions: GenericRepositoryOptions = {
     relations: ['credentials', { mediaAlbums: { mediaAlbum: true } }],
-    filters: ['id', 'username'],
+    filters: ['User.id', 'User.username'],
 };

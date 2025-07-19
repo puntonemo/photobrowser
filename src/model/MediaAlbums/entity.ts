@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn, Validate, ValidateOptions } from '@lib/database';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn, Validate, ValidateOptions, Schema } from '@lib/database';
 import { MediaAlbumItem } from 'model/MediaAlbumItems';
 import { UsersMediaAlbums } from 'model/UsersMediaAlbums';
 
@@ -9,6 +9,7 @@ export class MediaAlbum {
     @PrimaryGeneratedColumn()
     id!: string;
 
+    @Schema('list')
     @Validate('string|optional')
     @Column('varchar')
     title!: string;
