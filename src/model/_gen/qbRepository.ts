@@ -70,7 +70,6 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
             const joinAndSelect = (path: string, alias: string) => {
                 if (!qb.expressionMap.joinAttributes.some((j) => j.alias.name === alias)) {
                     qb.leftJoinAndSelect(path, alias);
-                    console.log('joinAndSelect', path, alias);
                     aliasMap[path] = alias;
                 }
             };
@@ -148,8 +147,6 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
 
         /*** APPLY RELATIONS ***/
         applyRelations(this.dataSource, qb, this.entityName, this.relations, filters, aliasMap);
-
-        console.log('selectColumns', selectColumns);
 
         if (Array.isArray(filters.columns)) selectColumns.push(...filters.columns as string[]);
 
