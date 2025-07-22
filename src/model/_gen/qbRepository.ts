@@ -41,7 +41,7 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
             return a.filter((item) => setB.has(item));
         }
         function getSchemaColumns(dataSource, entity, alias) {
-            if(!filters.schema) return [];
+            if (!filters.schema) return [];
             const schema = filters.schema;
             const metadata = dataSource.getMetadata(entity);
             if (metadata && metadata.relations) {
@@ -102,7 +102,7 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
                                 joinAndSelect(path, key);
                                 const metadata = dataSource.getMetadata(entityAlias); // entityAlias
                                 const rel = metadata.relations.find((r) => r.propertyName === key);
-                                if(rel) {
+                                if (rel) {
                                     const relName = (rel?.type as any).name;
                                     const columns = getSchemaColumns(dataSource, relName, key);
                                     selectColumns.push(...columns);
@@ -150,6 +150,8 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
         applyRelations(this.dataSource, qb, this.entityName, this.relations, filters, aliasMap);
 
         console.log('selectColumns', selectColumns);
+
+        if (Array.isArray(filters.columns)) selectColumns.push(...filters.columns as string[]);
 
         if (selectColumns.length > 0) qb = qb.select(selectColumns);
 
