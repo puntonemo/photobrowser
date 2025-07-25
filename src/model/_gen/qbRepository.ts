@@ -64,13 +64,11 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
             entityAlias: string,
             relations: GenericRepositoryOptions['relations'],
             filters: Record<string, any>,
-            aliasMap: Record<string, string>,
             parentPath: string = entityAlias,
         ) {
             const joinAndSelect = (path: string, alias: string) => {
                 if (!qb.expressionMap.joinAttributes.some((j) => j.alias.name === alias)) {
                     qb.leftJoinAndSelect(path, alias);
-                    aliasMap[path] = alias;
                 }
             };
 
@@ -106,7 +104,7 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
                                     const columns = getSchemaColumns(dataSource, relName, key);
                                     selectColumns.push(...columns);
                                     if (typeof value === 'object') {
-                                        applyRelations(dataSource, qb, relName, [value], relation[key], aliasMap, key);
+                                        applyRelations(dataSource, qb, relName, [value], relation[key], key);
                                     }
                                 }
                             }
@@ -127,8 +125,6 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
         const pageSize = filters?.pageSize ?? this.defaultPageSize;
         const skip = (page - 1) * pageSize;
 
-        const aliasMap: Record<string, string> = {};
-
         /*** SELECT COLUMNS ***/
         const selectColumns: string[] = [];
         if (
@@ -146,8 +142,9 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
         }
 
         /*** APPLY RELATIONS ***/
-        applyRelations(this.dataSource, qb, this.entityName, this.relations, filters, aliasMap);
+        applyRelations(this.dataSource, qb, this.entityName, this.relations, filters);
 
+        /*** SELECT COLUMN (RAW) */
         if (Array.isArray(filters.columns)) selectColumns.push(...filters.columns as string[]);
 
         if (selectColumns.length > 0) qb = qb.select(selectColumns);
@@ -167,9 +164,6 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
             const value = filters[filter] || filters[uniqueValue];
             if (value !== undefined) {
                 const parameterKey = filter.replace(/\./g, '_');
-                // const path = aliasMap[filter.split('.').slice(0, -1).join('.')]
-                //     ? `${aliasMap[filter.split('.').slice(0, -1).join('.')!]}.${filter.split('.').slice(-1)[0]}`
-                //     : `${this.entityName}.${filter}`;
                 const path = filter;
                 if (Array.isArray(value)) {
                     qb = qb.andWhere(`${path} IN (:...${parameterKey})`, { [parameterKey]: value });

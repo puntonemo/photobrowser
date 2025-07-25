@@ -8,7 +8,7 @@ async function init() {
     const user: User | undefined = await Repositories.Users.getOne({
         id: '1',
         schema: 'list',
-        mediaAlbums: true,
+        relations: true,
     });
 }
 
