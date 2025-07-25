@@ -6,7 +6,7 @@ import { User } from 'model/Users';
 async function init() {
     console.log('test');
     const user: User | undefined = await Repositories.Users.getOne({
-        id: '1',
+        username: 'correo',
         schema: 'list',
         relations: true,
     });

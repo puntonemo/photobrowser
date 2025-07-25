@@ -1,7 +1,7 @@
 import { DataSource, Repository, ObjectLiteral, FindOptionsWhere, In, IsNull } from 'typeorm';
 import { GenericFindDto } from './findDto';
-import { GenericRepositoryOptions } from './types';
-import { Schema } from '@lib/database';
+import { GenericRepositoryOptions, FilterFunction } from './types';
+import { eqFilter } from './filters';
 
 export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends FindOptionsWhere<ENTITY>> {
     public readonly dataSource: DataSource;
@@ -9,7 +9,7 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
     public readonly repository: Repository<ENTITY>;
     public readonly entityName: string;
     public readonly relations: Array<string | Record<string, any>>;
-    public readonly filters: string[];
+    public readonly filters: Array<string | { [filter: string]: FilterFunction }>;
     public readonly defaultPageSize: number;
 
     constructor(dataSource: DataSource, entity: { new (): ENTITY }, options?: GenericRepositoryOptions) {
@@ -145,7 +145,7 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
         applyRelations(this.dataSource, qb, this.entityName, this.relations, filters);
 
         /*** SELECT COLUMN (RAW) */
-        if (Array.isArray(filters.columns)) selectColumns.push(...filters.columns as string[]);
+        if (Array.isArray(filters.columns)) selectColumns.push(...(filters.columns as string[]));
 
         if (selectColumns.length > 0) qb = qb.select(selectColumns);
 
@@ -153,23 +153,25 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
             qb = qb.addOrderBy(filters.order, (filters.ascending ?? true) ? 'ASC' : 'DESC');
         }
 
-        // ilike filter with search
-        // if (filters.search) {
-        //     qb.andWhere(`${this.entityName}.email ILIKE :search OR ${this.entityName}.username ILIKE :search`, { search: `%${filters.search}%` });
-        // }
-
         this.filters.forEach((filter) => {
+            let filterColumn: string;
+            let filterFunction: FilterFunction;
+            let filterValue: any;
+
+            if (typeof filter === 'string') {
+                filterColumn = filter;
+                filterFunction = eqFilter;
+            } else {
+                filterColumn = Object.entries(filter)[0][0];
+                filterFunction = Object.entries(filter)[0][1] as unknown as FilterFunction;
+            }
             const uniqueValue =
-                filter.split('.').length === 0 ? `${this.entityName}.${filter}` : filter.split('.').splice(-1)[0];
-            const value = filters[filter] || filters[uniqueValue];
-            if (value !== undefined) {
-                const parameterKey = filter.replace(/\./g, '_');
-                const path = filter;
-                if (Array.isArray(value)) {
-                    qb = qb.andWhere(`${path} IN (:...${parameterKey})`, { [parameterKey]: value });
-                } else {
-                    qb = qb.andWhere(`${path} = :${parameterKey}`, { [parameterKey]: value });
-                }
+                filterColumn.split('.').length === 0
+                    ? `${this.entityName}.${filterColumn}`
+                    : filterColumn.split('.').splice(-1)[0];
+            filterValue = filters[filterColumn] || filters[uniqueValue];
+            if (filterValue !== undefined) {
+                filterFunction(qb, filterColumn, filterValue);
             }
         });
 
@@ -197,7 +199,4 @@ export class QBGenericRepository<ENTITY extends ObjectLiteral, FindDTO extends F
         const metadata = this.dataSource.getMetadata(this.entity);
         return metadata.columns.map((column) => column.propertyName);
     }
-    /*************/
-    /*** UTILS ***/
-    /*************/
 }

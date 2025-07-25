@@ -1,9 +1,10 @@
 import { GenericRepositoryOptions } from 'model/_gen';
+import { likeFilter } from 'model/_gen/filters';
 
 export * from './entity';
 export * from './findDto';
 
 export const UsersRepositoryOptions: GenericRepositoryOptions = {
     relations: ['credentials', { mediaAlbums: { mediaAlbum: true } }],
-    filters: ['User.id', 'User.username'],
+    filters: ['User.id', { 'User.username': likeFilter }],
 };
